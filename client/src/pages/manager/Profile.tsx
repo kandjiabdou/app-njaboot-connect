@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ManagerLayout from "@/components/layout/ManagerLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,9 +81,9 @@ export default function ManagerProfile() {
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
+      <ManagerLayout>
+        <LoadingSpinner size="lg" className="min-h-[400px]" />
+      </ManagerLayout>
     );
   }
 
@@ -96,7 +97,7 @@ export default function ManagerProfile() {
   };
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <ManagerLayout>
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
@@ -622,6 +623,6 @@ export default function ManagerProfile() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </ManagerLayout>
   );
 }

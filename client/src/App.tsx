@@ -23,13 +23,17 @@ import CustomerProfile from "@/pages/customer/Profile";
 import StoreFinder from "@/pages/customer/StoreFinder";
 import LoyaltyPoints from "@/pages/customer/LoyaltyPoints";
 import DebtTracking from "@/pages/customer/DebtTracking";
+import UnifiedNavbar from "@/components/layout/UnifiedNavbar";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={CustomerHome} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <UnifiedNavbar />
+      <main>
+        <Switch>
+          <Route path="/" component={CustomerHome} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
       
       {/* Manager routes */}
       <Route path="/manager" component={ManagerDashboard} />
@@ -51,9 +55,11 @@ function Router() {
       <Route path="/cart" component={CustomerCart} />
       <Route path="/profile" component={CustomerProfile} />
       
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+          {/* Fallback to 404 */}
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+    </div>
   );
 }
 
