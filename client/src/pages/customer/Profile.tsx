@@ -14,11 +14,7 @@ import { User, MapPin, Phone, Mail, Crown, Gift, ShoppingBag, Star } from "lucid
 export default function CustomerProfile() {
   const { user } = useAuth();
 
-  // Redirect managers to their specific profile page
-  if (user && user.role === "manager") {
-    window.location.href = "/manager/profile";
-    return null;
-  }
+
 
   // Fetch customer orders
   const { data: orders, isLoading: ordersLoading } = useQuery({
