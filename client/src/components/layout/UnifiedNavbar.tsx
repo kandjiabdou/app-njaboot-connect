@@ -230,7 +230,7 @@ export default function UnifiedNavbar() {
                   </div>
                 )}
                 
-                <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
+                <Link href="/profile">
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
@@ -302,7 +302,7 @@ export default function UnifiedNavbar() {
                   </div>
 
                   <div className="border-t pt-4 space-y-2">
-                    <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
+                    <Link href="/profile">
                       <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
                         <User className="mr-2 h-4 w-4" />
                         Profil
