@@ -12,6 +12,10 @@ import ManagerDashboard from "@/pages/manager/Dashboard";
 import ManagerInventory from "@/pages/manager/Inventory";
 import ManagerSales from "@/pages/manager/Sales";
 import ManagerOrders from "@/pages/manager/Orders";
+import ManagerCustomers from "@/pages/manager/Customers";
+import ManagerAnalytics from "@/pages/manager/Analytics";
+import ManagerSettings from "@/pages/manager/Settings";
+import ManagerProfile from "@/pages/manager/Profile";
 import CustomerHome from "@/pages/customer/Home";
 import CustomerProducts from "@/pages/customer/Products";
 import CustomerCart from "@/pages/customer/Cart";
@@ -30,6 +34,10 @@ function Router() {
       <Route path="/manager/inventory" component={ManagerInventory} />
       <Route path="/manager/sales" component={ManagerSales} />
       <Route path="/manager/orders" component={ManagerOrders} />
+      <Route path="/manager/customers" component={ManagerCustomers} />
+      <Route path="/manager/analytics" component={ManagerAnalytics} />
+      <Route path="/manager/settings" component={ManagerSettings} />
+      <Route path="/manager/profile" component={ManagerProfile} />
       
       {/* Customer routes */}
       <Route path="/shop" component={CustomerHome} />
