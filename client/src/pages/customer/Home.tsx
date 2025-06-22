@@ -128,7 +128,6 @@ export default function CustomerHome() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
       <main>
         {/* Hero Section */}
         <div 

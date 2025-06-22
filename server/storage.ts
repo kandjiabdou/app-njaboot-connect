@@ -274,7 +274,9 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id, 
-      createdAt: new Date() 
+      createdAt: new Date(),
+      address: insertUser.address ?? null,
+      phone: insertUser.phone ?? null
     };
     this.users.set(id, user);
     return user;
@@ -300,7 +302,13 @@ export class MemStorage implements IStorage {
 
   async createStore(insertStore: InsertStore): Promise<Store> {
     const id = this.currentStoreId++;
-    const store: Store = { ...insertStore, id };
+    const store: Store = { 
+      ...insertStore, 
+      id,
+      managerId: insertStore.managerId ?? null,
+      phone: insertStore.phone ?? null,
+      isActive: insertStore.isActive ?? null
+    };
     this.stores.set(id, store);
     return store;
   }
@@ -312,7 +320,11 @@ export class MemStorage implements IStorage {
 
   async createCategory(insertCategory: InsertCategory): Promise<Category> {
     const id = this.currentCategoryId++;
-    const category: Category = { ...insertCategory, id };
+    const category: Category = { 
+      ...insertCategory, 
+      id,
+      description: insertCategory.description ?? null
+    };
     this.categories.set(id, category);
     return category;
   }
@@ -332,7 +344,14 @@ export class MemStorage implements IStorage {
 
   async createProduct(insertProduct: InsertProduct): Promise<Product> {
     const id = this.currentProductId++;
-    const product: Product = { ...insertProduct, id };
+    const product: Product = { 
+      ...insertProduct, 
+      id,
+      isActive: insertProduct.isActive ?? null,
+      description: insertProduct.description ?? null,
+      categoryId: insertProduct.categoryId ?? null,
+      imageUrl: insertProduct.imageUrl ?? null
+    };
     this.products.set(id, product);
     return product;
   }
@@ -350,7 +369,7 @@ export class MemStorage implements IStorage {
   async getInventoryByStore(storeId: number): Promise<(Inventory & { product: Product })[]> {
     const result: (Inventory & { product: Product })[] = [];
     
-    for (const [key, item] of this.inventory.entries()) {
+    for (const [key, item] of Array.from(this.inventory.entries())) {
       if (item.storeId === storeId) {
         const product = this.products.get(item.productId!);
         if (product) {
@@ -382,7 +401,10 @@ export class MemStorage implements IStorage {
     const item: Inventory = { 
       ...insertItem, 
       id,
-      lastUpdated: new Date() 
+      lastUpdated: new Date(),
+      productId: insertItem.productId ?? null,
+      storeId: insertItem.storeId ?? null,
+      minStock: insertItem.minStock ?? null
     };
     const key = `${item.productId}-${item.storeId}`;
     this.inventory.set(key, item);
@@ -393,7 +415,7 @@ export class MemStorage implements IStorage {
   async getOrders(): Promise<(Order & { customer: User; store: Store })[]> {
     const result: (Order & { customer: User; store: Store })[] = [];
     
-    for (const order of this.orders.values()) {
+    for (const order of Array.from(this.orders.values())) {
       const customer = this.users.get(order.customerId!);
       const store = this.stores.get(order.storeId!);
       if (customer && store) {
@@ -407,7 +429,7 @@ export class MemStorage implements IStorage {
   async getOrdersByStore(storeId: number): Promise<(Order & { customer: User })[]> {
     const result: (Order & { customer: User })[] = [];
     
-    for (const order of this.orders.values()) {
+    for (const order of Array.from(this.orders.values())) {
       if (order.storeId === storeId) {
         const customer = this.users.get(order.customerId!);
         if (customer) {
@@ -422,7 +444,7 @@ export class MemStorage implements IStorage {
   async getOrdersByCustomer(customerId: number): Promise<(Order & { store: Store })[]> {
     const result: (Order & { store: Store })[] = [];
     
-    for (const order of this.orders.values()) {
+    for (const order of Array.from(this.orders.values())) {
       if (order.customerId === customerId) {
         const store = this.stores.get(order.storeId!);
         if (store) {
@@ -453,7 +475,11 @@ export class MemStorage implements IStorage {
       ...insertOrder, 
       id,
       createdAt: new Date(),
-      deliveredAt: null 
+      deliveredAt: null,
+      storeId: insertOrder.storeId ?? null,
+      customerId: insertOrder.customerId ?? null,
+      deliveryAddress: insertOrder.deliveryAddress ?? null,
+      notes: insertOrder.notes ?? null
     };
     this.orders.set(id, order);
     return order;
@@ -489,7 +515,12 @@ export class MemStorage implements IStorage {
 
   async createOrderItem(insertItem: InsertOrderItem): Promise<OrderItem> {
     const id = this.currentOrderItemId++;
-    const item: OrderItem = { ...insertItem, id };
+    const item: OrderItem = { 
+      ...insertItem, 
+      id,
+      productId: insertItem.productId ?? null,
+      orderId: insertItem.orderId ?? null
+    };
     
     const existingItems = this.orderItems.get(item.orderId!) || [];
     existingItems.push(item);
@@ -520,7 +551,10 @@ export class MemStorage implements IStorage {
     const sale: Sale = { 
       ...insertSale, 
       id,
-      createdAt: new Date() 
+      createdAt: new Date(),
+      managerId: insertSale.managerId ?? null,
+      storeId: insertSale.storeId ?? null,
+      items: insertSale.items ?? null
     };
     this.sales.set(id, sale);
     return sale;
@@ -568,7 +602,9 @@ export class MemStorage implements IStorage {
     const notification: Notification = { 
       ...insertNotification, 
       id,
-      createdAt: new Date() 
+      createdAt: new Date(),
+      userId: insertNotification.userId ?? null,
+      isRead: insertNotification.isRead ?? null
     };
     this.notifications.set(id, notification);
     return notification;

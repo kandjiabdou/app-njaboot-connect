@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import Navbar from "@/components/layout/Navbar";
+
 import ProductCard from "@/components/common/ProductCard";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,6 @@ export default function CustomerProducts() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Card>
             <CardContent className="p-8 text-center">
@@ -86,7 +85,6 @@ export default function CustomerProducts() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
