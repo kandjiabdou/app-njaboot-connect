@@ -50,7 +50,14 @@ export default function UnifiedNavbar() {
 
   const getCurrentLinks = () => {
     if (!user) return customerLinks;
-    return user.role === "manager" ? managerLinks : customerLinks;
+    
+    // Show manager links only when on manager routes
+    if (location.startsWith("/manager")) {
+      return managerLinks;
+    }
+    
+    // Default to customer links for all other routes
+    return customerLinks;
   };
 
   const isActiveLink = (href: string) => {
@@ -97,7 +104,7 @@ export default function UnifiedNavbar() {
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href={user.role === "manager" ? "/manager/dashboard" : "/"}>
+            <Link href={location.startsWith("/manager") ? "/manager/dashboard" : "/"}>
               <div className="flex-shrink-0 flex items-center">
                 <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                   <Store className="h-5 w-5 text-white" />
@@ -135,27 +142,29 @@ export default function UnifiedNavbar() {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
-            {/* Role Switch Button */}
-            <div className="hidden md:block">
-              {user.role === "manager" ? (
-                <Link href="/">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <ShoppingCart className="h-4 w-4" />
-                    Vue Client
-                  </Button>
-                </Link>
-              ) : (
-                <Link href="/manager/dashboard">
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Vue Gérant
-                  </Button>
-                </Link>
-              )}
-            </div>
+            {/* Role Switch Button - Only show for managers */}
+            {user.role === "manager" && (
+              <div className="hidden md:block">
+                {location.startsWith("/manager") ? (
+                  <Link href="/">
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <ShoppingCart className="h-4 w-4" />
+                      Vue Client
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/manager/dashboard">
+                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Vue Gérant
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            )}
 
-            {/* Cart for customers (desktop only) */}
-            {user.role === "customer" && (
+            {/* Cart (desktop only) - Show for all users when not on manager routes */}
+            {!location.startsWith("/manager") && (
               <Link href="/cart" className="hidden md:block">
                 <Button variant="ghost" size="sm" className="relative">
                   <ShoppingCart className="h-5 w-5" />
@@ -199,33 +208,35 @@ export default function UnifiedNavbar() {
                 </div>
                 <DropdownMenuSeparator />
                 
-                {/* Role Switch in Mobile Menu */}
-                <div className="md:hidden">
-                  {user.role === "manager" ? (
-                    <Link href="/">
-                      <DropdownMenuItem>
-                        <ShoppingCart className="mr-2 h-4 w-4" />
-                        <span>Vue Client</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  ) : (
-                    <Link href="/manager/dashboard">
-                      <DropdownMenuItem>
-                        <BarChart3 className="mr-2 h-4 w-4" />
-                        <span>Vue Gérant</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  )}
-                  <DropdownMenuSeparator />
-                </div>
+                {/* Role Switch in Mobile Menu - Only show for managers */}
+                {user.role === "manager" && (
+                  <div className="md:hidden">
+                    {location.startsWith("/manager") ? (
+                      <Link href="/">
+                        <DropdownMenuItem>
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          <span>Vue Client</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    ) : (
+                      <Link href="/manager/dashboard">
+                        <DropdownMenuItem>
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          <span>Vue Gérant</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    )}
+                    <DropdownMenuSeparator />
+                  </div>
+                )}
                 
-                <Link href={user.role === "manager" ? "/manager/profile" : "/profile"}>
+                <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
                   </DropdownMenuItem>
                 </Link>
-                {user.role === "manager" && (
+                {location.startsWith("/manager") && (
                   <Link href="/manager/settings">
                     <DropdownMenuItem>
                       <Settings className="mr-2 h-4 w-4" />
@@ -291,13 +302,13 @@ export default function UnifiedNavbar() {
                   </div>
 
                   <div className="border-t pt-4 space-y-2">
-                    <Link href={user.role === "manager" ? "/manager/profile" : "/profile"}>
+                    <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
                       <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
                         <User className="mr-2 h-4 w-4" />
                         Profil
                       </Button>
                     </Link>
-                    {user.role === "manager" && (
+                    {location.startsWith("/manager") && (
                       <Link href="/manager/settings">
                         <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
                           <Settings className="mr-2 h-4 w-4" />
