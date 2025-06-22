@@ -1,0 +1,109 @@
+# Prompt Complet Replit - Frontend MVP Njaboot Connect
+
+## Objectif du Projet
+Créer le frontend MVP d'une application de gestion de franchise alimentaire locale avec boutique en ligne intégrée, focalisée sur deux rôles principaux : Franchisé (Gérant de Boutique) et Client (Utilisateur de la Boutique en Ligne). L'application doit simuler les fonctionnalités backend avec des données mockées.
+
+## Consignes Techniques Générales
+
+### Stack Frontend Recommandée
+Utiliser React.js avec TypeScript, Tailwind CSS pour le styling, React Router pour la navigation, et Context API pour la gestion d'état global. Intégrer des librairies comme Lucide React pour les icônes, Chart.js ou Recharts pour les graphiques, et date-fns pour la gestion des dates.
+
+### Architecture des Dossiers
+Organiser le projet avec une structure claire : composants partagés dans un dossier common, pages spécifiques pour chaque rôle, contexts pour la gestion d'état, hooks personnalisés, services pour la logique métier, et utils pour les fonctions utilitaires.
+
+### Données Simulées
+Créer des fichiers JSON mockés pour simuler la base de données avec des utilisateurs, produits, stocks, commandes, et boutiques. Implémenter des services qui simulent les appels API avec setTimeout pour reproduire la latence réseau.
+
+## Spécifications pour l'Espace Franchisé
+
+### Interface d'Authentification Franchisé
+Créer une page de connexion dédiée aux gérants avec validation des champs, gestion des erreurs, et redirection vers le dashboard après authentification. Prévoir un système de mot de passe oublié simulé et une option "Se souvenir de moi".
+
+### Dashboard Principal Franchisé
+Développer un tableau de bord avec des KPI essentiels : chiffre d'affaires du jour, nombre de commandes en cours, alertes stock critique, et produits les plus vendus. Intégrer des graphiques pour visualiser l'évolution des ventes sur 7 jours et la répartition des ventes par catégorie de produits.
+
+### Module Gestion des Stocks
+Implémenter une interface avec liste paginée des produits, filtres par catégorie et statut stock, barre de recherche, et alertes visuelles pour les stocks faibles. Créer des modales pour ajouter/modifier des produits avec validation des formulaires. Intégrer un système de scan de code-barres simulé et un historique des mouvements de stock.
+
+### Module Gestion des Ventes
+Développer une interface de caisse avec recherche de produits en temps réel, panier dynamique, calcul automatique des totaux et taxes, application des promotions, et choix des méthodes de paiement. Créer un historique des ventes avec filtres par date et montant, et génération de reçus PDF simulée.
+
+### Module Gestion des Commandes Clients
+Implémenter un système de suivi des commandes avec statuts visuels, notifications temps réel simulées, gestion des commandes de retrait et livraison, et interface de communication avec les clients. Prévoir un calendrier des livraisons et un système d'assignation aux employés.
+
+### Module de Contrôle des Prix
+Créer une interface pour vérifier les prix fixés par l'État, comparer avec les prix de vente actuels, signaler les écarts, et recevoir les notifications de changements de prix. Intégrer un historique des modifications de prix et des alertes automatiques.
+
+### Système de Notifications
+Développer un centre de notifications avec alertes stock, nouvelles commandes, changements de prix, messages du siège, et rappels de tâches. Implémenter des notifications push simulées et un système de marquage lu/non-lu.
+
+## Spécifications pour l'Espace Client
+
+### Interface d'Authentification Client
+Créer des pages d'inscription et connexion client avec validation email, confirmation de mot de passe, conditions d'utilisation, et options de connexion sociale simulées. Prévoir un profil utilisateur modifiable avec historique des commandes.
+
+### Boutique en Ligne
+Développer un catalogue produits avec grille responsive, filtres avancés par catégorie, prix, disponibilité, et localisation. Implémenter une recherche intelligente avec suggestions, tri par pertinence/prix/popularité, et système de favoris. Créer des pages produit détaillées avec galerie d'images, descriptions, avis clients, et produits similaires.
+
+### Système de Panier et Commande
+Implémenter un panier persistant avec modification des quantités, calcul automatique des frais, codes promo, et sauvegarde de panier. Créer un tunnel de commande en plusieurs étapes : validation panier, choix livraison/retrait, adresse, paiement, et confirmation. Intégrer un système de paiement simulé avec différentes méthodes.
+
+### Gestion des Livraisons et Retraits
+Développer une interface de choix entre livraison et retrait en magasin avec sélection de créneaux, calcul automatique des frais de livraison selon la zone, tracking de commande en temps réel, et notifications SMS/email simulées.
+
+### Programme de Fidélité
+Créer un système de points avec accumulation automatique, historique des gains/dépenses, niveaux de fidélité, récompenses exclusives, et parrainage d'amis. Implémenter un portefeuille de coupons et des offres personnalisées.
+
+### Système d'Avis et Notation
+Développer une interface de notation des produits et boutiques avec photos, commentaires détaillés, réponses des gérants, et modération des avis. Créer un système de vote utile/pas utile et de signalement d'abus.
+
+### Espace Compte Client
+Implémenter un espace personnel avec historique complet des commandes, suivi des livraisons, gestion des adresses, méthodes de paiement sauvegardées, préférences de communication, et données de fidélité.
+
+## Fonctionnalités Transversales
+
+### Système de Communication
+Développer un chat en temps réel simulé entre clients et gérants, notifications push pour les deux types d'utilisateurs, système de tickets de support, et FAQ interactive.
+
+### Responsive Design
+Assurer une compatibilité mobile parfaite avec navigation adaptée, interfaces tactiles optimisées, performance sur mobile, et mode hors-ligne basique avec mise en cache.
+
+### Accessibilité
+Implémenter les standards WCAG avec navigation clavier, lecteurs d'écran, contrastes suffisants, textes alternatifs pour les images, et tailles de police ajustables.
+
+### Performance et UX
+Optimiser le chargement avec lazy loading des images, pagination intelligente, skeleton screens pendant le chargement, cache intelligent des données, et feedback visuel pour toutes les actions utilisateur.
+
+## Données Mockées Requises
+
+### Profils Utilisateurs
+Créer des profils réalistes pour 5 gérants de boutique et 20 clients avec informations complètes, historiques d'achat, préférences, et données de géolocalisation.
+
+### Catalogue Produits
+Générer un catalogue de 100 produits alimentaires locaux avec images, descriptions détaillées, prix, stocks, catégories, fournisseurs, et avis clients.
+
+### Commandes et Transactions
+Simuler 10 commandes avec différents statuts, méthodes de paiement, types de livraison, et historique temporel réaliste. 
+
+### Données Analytics
+Créer des jeux de données pour les graphiques de performance avec tendances de vente, produits populaires, heures de pointe, et données géographiques.
+
+## Critères de Réussite du MVP
+
+### Fonctionnalités Essentielles
+Le MVP doit permettre à un gérant de visualiser son stock, enregistrer des ventes, gérer les commandes clients, et recevoir des alertes. Un client doit pouvoir parcourir les produits, passer commande, choisir sa méthode de récupération, et suivre sa commande.
+
+### Expérience Utilisateur
+L'interface doit être intuitive, responsive, et performante avec des temps de chargement inférieurs à 3 secondes, une navigation fluide, et des retours visuels clairs pour chaque action.
+
+### Qualité Technique
+Le code doit être propre, bien structuré, commenté, et réutilisable avec gestion d'erreurs appropriée, validation des formulaires, et tests unitaires pour les fonctions critiques.
+
+### Évolutivité
+L'architecture doit permettre l'ajout facile de nouvelles fonctionnalités, l'intégration future d'APIs réelles, et la montée en charge avec plus d'utilisateurs et de données.
+
+## Instructions de Développement
+
+Commencer par la structure de base de l'application avec routing et authentification, puis développer les interfaces core pour chaque rôle en parallèle. Implémenter ensuite les fonctionnalités avancées et optimiser l'expérience utilisateur. Tester intensivement sur différents devices et navigateurs avant la livraison du MVP.
+
+Prioriser la simplicité d'utilisation et la performance, avec une attention particulière à l'ergonomie mobile. Documenter le code et prévoir des commentaires explicatifs pour faciliter la maintenance et l'évolution future de l'application.
