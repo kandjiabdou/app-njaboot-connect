@@ -15,7 +15,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
 import { 
   Store, Bell, ShoppingCart, User, LogOut, Settings, Menu,
-  BarChart3, Package, Users, TrendingUp, ShoppingBag, Cog
+  BarChart3, Package, Users, TrendingUp, ShoppingBag, Cog, MapPin,
+  Star, CreditCard
 } from "lucide-react";
 
 export default function Navbar() {
@@ -55,6 +56,9 @@ export default function Navbar() {
   const customerLinks = [
     { href: "/", label: "Accueil", icon: Store },
     { href: "/products", label: "Produits", icon: Package },
+    { href: "/stores", label: "Boutiques", icon: MapPin },
+    { href: "/loyalty", label: "Fidélité", icon: Star },
+    { href: "/debt", label: "Crédit", icon: CreditCard },
     { href: "/cart", label: "Panier", icon: ShoppingCart },
   ];
 

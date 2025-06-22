@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import ManagerLayout from "@/components/layout/ManagerLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -131,9 +132,9 @@ export default function ManagerSettings() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
+    <ManagerLayout>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
             Paramètres
@@ -574,6 +575,6 @@ export default function ManagerSettings() {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </ManagerLayout>
   );
 }

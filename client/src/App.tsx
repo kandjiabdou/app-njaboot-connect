@@ -20,6 +20,9 @@ import CustomerHome from "@/pages/customer/Home";
 import CustomerProducts from "@/pages/customer/Products";
 import CustomerCart from "@/pages/customer/Cart";
 import CustomerProfile from "@/pages/customer/Profile";
+import StoreFinder from "@/pages/customer/StoreFinder";
+import LoyaltyPoints from "@/pages/customer/LoyaltyPoints";
+import DebtTracking from "@/pages/customer/DebtTracking";
 
 function Router() {
   return (
@@ -42,6 +45,9 @@ function Router() {
       {/* Customer routes */}
       <Route path="/shop" component={CustomerHome} />
       <Route path="/products" component={CustomerProducts} />
+      <Route path="/stores" component={StoreFinder} />
+      <Route path="/loyalty" component={LoyaltyPoints} />
+      <Route path="/debt" component={DebtTracking} />
       <Route path="/cart" component={CustomerCart} />
       <Route path="/profile" component={CustomerProfile} />
       
