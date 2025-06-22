@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
+import ManagerLayout from "@/components/layout/ManagerLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -102,14 +101,9 @@ export default function ManagerInventory() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Navbar />
-      <div className="flex">
-        <Sidebar userRole="manager" className="border-r bg-white dark:bg-gray-800" />
-        
-        <main className="flex-1 p-8">
-          {/* Header */}
-          <div className="mb-8">
+    <ManagerLayout>
+      {/* Header */}
+      <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Gestion des Stocks
             </h1>
@@ -307,8 +301,6 @@ export default function ManagerInventory() {
               )}
             </CardContent>
           </Card>
-        </main>
-      </div>
-    </div>
+    </ManagerLayout>
   );
 }

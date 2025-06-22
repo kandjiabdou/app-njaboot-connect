@@ -135,6 +135,25 @@ export default function UnifiedNavbar() {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
+            {/* Role Switch Button */}
+            <div className="hidden md:block">
+              {user.role === "manager" ? (
+                <Link href="/">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    Vue Client
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/manager/dashboard">
+                  <Button variant="outline" size="sm" className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Vue Gérant
+                  </Button>
+                </Link>
+              )}
+            </div>
+
             {/* Cart for customers (desktop only) */}
             {user.role === "customer" && (
               <Link href="/cart" className="hidden md:block">
@@ -179,6 +198,27 @@ export default function UnifiedNavbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
+                
+                {/* Role Switch in Mobile Menu */}
+                <div className="md:hidden">
+                  {user.role === "manager" ? (
+                    <Link href="/">
+                      <DropdownMenuItem>
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        <span>Vue Client</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  ) : (
+                    <Link href="/manager/dashboard">
+                      <DropdownMenuItem>
+                        <BarChart3 className="mr-2 h-4 w-4" />
+                        <span>Vue Gérant</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  )}
+                  <DropdownMenuSeparator />
+                </div>
+                
                 <Link href={user.role === "manager" ? "/manager/profile" : "/profile"}>
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
