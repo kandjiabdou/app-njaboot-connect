@@ -350,6 +350,22 @@ export class MemStorage implements IStorage {
     return store;
   }
 
+  async getStoresByProduct(productId: number): Promise<Store[]> {
+    const storesWithProduct: Store[] = [];
+    
+    // Find stores that have this product in inventory
+    for (const inventory of this.inventory.values()) {
+      if (inventory.productId === productId && inventory.quantity > 0) {
+        const store = this.stores.get(inventory.storeId);
+        if (store && !storesWithProduct.find(s => s.id === store.id)) {
+          storesWithProduct.push(store);
+        }
+      }
+    }
+    
+    return storesWithProduct;
+  }
+
   // Category methods
   async getCategories(): Promise<Category[]> {
     return Array.from(this.categories.values());

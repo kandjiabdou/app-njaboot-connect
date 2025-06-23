@@ -23,6 +23,7 @@ import CustomerCart from "@/pages/customer/Cart";
 import CustomerProfile from "@/pages/customer/Profile";
 import ProductDetail from "@/pages/customer/ProductDetail";
 import StoreFinder from "@/pages/customer/StoreFinder";
+import StoreDetail from "@/pages/customer/StoreDetail";
 import LoyaltyPoints from "@/pages/customer/LoyaltyPoints";
 import DebtTracking from "@/pages/customer/DebtTracking";
 import UnifiedNavbar from "@/components/layout/UnifiedNavbar";
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/shop" component={CustomerHome} />
       <Route path="/products" component={CustomerProducts} />
       <Route path="/stores" component={StoreFinder} />
+      <Route path="/store/:id" component={StoreDetail} />
       <Route path="/loyalty" component={LoyaltyPoints} />
       <Route path="/debt" component={DebtTracking} />
       <Route path="/cart" component={CustomerCart} />

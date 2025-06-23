@@ -147,6 +147,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get specific store
+  app.get("/api/stores/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const store = await storage.getStore(parseInt(id));
+      
+      if (!store) {
+        return res.status(404).json({ message: "Boutique non trouvée" });
+      }
+      
+      res.json(store);
+    } catch (error) {
+      console.error("Error fetching store:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
   app.post("/api/products", async (req, res) => {
     try {
       const productData = insertProductSchema.parse(req.body);
