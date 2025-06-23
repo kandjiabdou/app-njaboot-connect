@@ -21,6 +21,7 @@ import CustomerHome from "@/pages/customer/Home";
 import CustomerProducts from "@/pages/customer/Products";
 import CustomerCart from "@/pages/customer/Cart";
 import CustomerProfile from "@/pages/customer/Profile";
+import ProductDetail from "@/pages/customer/ProductDetail";
 import StoreFinder from "@/pages/customer/StoreFinder";
 import LoyaltyPoints from "@/pages/customer/LoyaltyPoints";
 import DebtTracking from "@/pages/customer/DebtTracking";
@@ -56,6 +57,7 @@ function Router() {
       <Route path="/debt" component={DebtTracking} />
       <Route path="/cart" component={CustomerCart} />
       <Route path="/profile" component={CustomerProfile} />
+      <Route path="/product/:id" component={ProductDetail} />
       
           {/* Fallback to 404 */}
           <Route component={NotFound} />

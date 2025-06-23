@@ -135,6 +135,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get stores that have a specific product
+  app.get("/api/stores/product/:productId", async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const stores = await storage.getStoresByProduct(parseInt(productId));
+      res.json(stores);
+    } catch (error) {
+      console.error("Error fetching stores for product:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
   app.post("/api/products", async (req, res) => {
     try {
       const productData = insertProductSchema.parse(req.body);

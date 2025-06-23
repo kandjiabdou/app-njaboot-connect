@@ -25,6 +25,7 @@ export interface IStorage {
   getStore(id: number): Promise<Store | undefined>;
   getStoreByManagerId(managerId: number): Promise<Store | undefined>;
   createStore(store: InsertStore): Promise<Store>;
+  getStoresByProduct(productId: number): Promise<Store[]>;
   
   // Categories
   getCategories(): Promise<Category[]>;
