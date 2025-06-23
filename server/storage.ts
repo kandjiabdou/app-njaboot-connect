@@ -1,12 +1,17 @@
 import { 
   users, stores, categories, products, inventory, orders, orderItems, 
-  sales, loyaltyPoints, notifications,
+  sales, loyaltyPoints, notifications, purchasingCenters, centerProducts,
+  supplyOrders, supplyOrderItems,
   type User, type InsertUser, type Store, type InsertStore,
   type Category, type InsertCategory, type Product, type InsertProduct,
   type Inventory, type InsertInventory, type Order, type InsertOrder,
   type OrderItem, type InsertOrderItem, type Sale, type InsertSale,
   type LoyaltyPoints, type InsertLoyaltyPoints,
-  type Notification, type InsertNotification
+  type Notification, type InsertNotification,
+  type PurchasingCenter, type InsertPurchasingCenter,
+  type CenterProduct, type InsertCenterProduct,
+  type SupplyOrder, type InsertSupplyOrder,
+  type SupplyOrderItem, type InsertSupplyOrderItem
 } from "@shared/schema";
 
 export interface IStorage {
@@ -63,6 +68,27 @@ export interface IStorage {
   getNotificationsByUser(userId: number): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
   markNotificationAsRead(id: number): Promise<Notification | undefined>;
+
+  // Purchasing Centers
+  getPurchasingCenters(): Promise<PurchasingCenter[]>;
+  getPurchasingCenter(id: number): Promise<PurchasingCenter | undefined>;
+  createPurchasingCenter(center: InsertPurchasingCenter): Promise<PurchasingCenter>;
+
+  // Center Products
+  getCenterProducts(centerId: number): Promise<(CenterProduct & { product: Product })[]>;
+  getCenterProduct(centerId: number, productId: number): Promise<CenterProduct | undefined>;
+  createCenterProduct(centerProduct: InsertCenterProduct): Promise<CenterProduct>;
+  updateCenterProduct(id: number, updates: Partial<InsertCenterProduct>): Promise<CenterProduct | undefined>;
+
+  // Supply Orders
+  getSupplyOrders(storeId: number): Promise<(SupplyOrder & { center: PurchasingCenter })[]>;
+  getSupplyOrder(id: number): Promise<(SupplyOrder & { center: PurchasingCenter; items: (SupplyOrderItem & { product: Product })[] }) | undefined>;
+  createSupplyOrder(order: InsertSupplyOrder): Promise<SupplyOrder>;
+  updateSupplyOrderStatus(id: number, status: string, updates?: Partial<InsertSupplyOrder>): Promise<SupplyOrder | undefined>;
+
+  // Supply Order Items
+  createSupplyOrderItem(item: InsertSupplyOrderItem): Promise<SupplyOrderItem>;
+  getSupplyOrderItems(orderId: number): Promise<(SupplyOrderItem & { product: Product })[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -76,6 +102,10 @@ export class MemStorage implements IStorage {
   private sales: Map<number, Sale> = new Map();
   private loyaltyPoints: Map<number, LoyaltyPoints> = new Map(); // key: customerId
   private notifications: Map<number, Notification> = new Map();
+  private purchasingCenters: Map<number, PurchasingCenter> = new Map();
+  private centerProducts: Map<number, CenterProduct> = new Map();
+  private supplyOrders: Map<number, SupplyOrder> = new Map();
+  private supplyOrderItems: Map<number, SupplyOrderItem[]> = new Map(); // key: orderId
   
   private currentUserId = 1;
   private currentStoreId = 1;
@@ -87,6 +117,10 @@ export class MemStorage implements IStorage {
   private currentSaleId = 1;
   private currentLoyaltyId = 1;
   private currentNotificationId = 1;
+  private currentPurchasingCenterId = 1;
+  private currentCenterProductId = 1;
+  private currentSupplyOrderId = 1;
+  private currentSupplyOrderItemId = 1;
 
   constructor() {
     this.initializeData();
@@ -94,6 +128,8 @@ export class MemStorage implements IStorage {
 
   private initializeData() {
     // Initialize with mock data
+    this.initializePurchasingCenters();
+    
     // Categories
     const categories = [
       { id: 1, name: "Céréales", description: "Riz, mil, blé et autres céréales" },
@@ -614,9 +650,251 @@ export class MemStorage implements IStorage {
     const notification = this.notifications.get(id);
     if (!notification) return undefined;
     
-    const updated = { ...notification, isRead: true };
+    const updated = { ...notification, read: true };
     this.notifications.set(id, updated);
     return updated;
+  }
+
+  // Purchasing Centers
+  async getPurchasingCenters(): Promise<PurchasingCenter[]> {
+    return Array.from(this.purchasingCenters.values());
+  }
+
+  async getPurchasingCenter(id: number): Promise<PurchasingCenter | undefined> {
+    return this.purchasingCenters.get(id);
+  }
+
+  async createPurchasingCenter(insertCenter: InsertPurchasingCenter): Promise<PurchasingCenter> {
+    const center: PurchasingCenter = { 
+      id: this.currentPurchasingCenterId++, 
+      ...insertCenter,
+      createdAt: new Date()
+    };
+    this.purchasingCenters.set(center.id, center);
+    return center;
+  }
+
+  // Center Products
+  async getCenterProducts(centerId: number): Promise<(CenterProduct & { product: Product })[]> {
+    const result: (CenterProduct & { product: Product })[] = [];
+    for (const centerProduct of this.centerProducts.values()) {
+      if (centerProduct.centerId === centerId) {
+        const product = this.products.get(centerProduct.productId);
+        if (product) {
+          result.push({ ...centerProduct, product });
+        }
+      }
+    }
+    return result;
+  }
+
+  async getCenterProduct(centerId: number, productId: number): Promise<CenterProduct | undefined> {
+    for (const centerProduct of this.centerProducts.values()) {
+      if (centerProduct.centerId === centerId && centerProduct.productId === productId) {
+        return centerProduct;
+      }
+    }
+    return undefined;
+  }
+
+  async createCenterProduct(insertCenterProduct: InsertCenterProduct): Promise<CenterProduct> {
+    const centerProduct: CenterProduct = { 
+      id: this.currentCenterProductId++, 
+      ...insertCenterProduct,
+      lastUpdated: new Date()
+    };
+    this.centerProducts.set(centerProduct.id, centerProduct);
+    return centerProduct;
+  }
+
+  async updateCenterProduct(id: number, updates: Partial<InsertCenterProduct>): Promise<CenterProduct | undefined> {
+    const centerProduct = this.centerProducts.get(id);
+    if (!centerProduct) return undefined;
+    
+    const updated = { ...centerProduct, ...updates, lastUpdated: new Date() };
+    this.centerProducts.set(id, updated);
+    return updated;
+  }
+
+  // Supply Orders
+  async getSupplyOrders(storeId: number): Promise<(SupplyOrder & { center: PurchasingCenter })[]> {
+    const result: (SupplyOrder & { center: PurchasingCenter })[] = [];
+    for (const order of this.supplyOrders.values()) {
+      if (order.storeId === storeId) {
+        const center = this.purchasingCenters.get(order.centerId);
+        if (center) {
+          result.push({ ...order, center });
+        }
+      }
+    }
+    return result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  async getSupplyOrder(id: number): Promise<(SupplyOrder & { center: PurchasingCenter; items: (SupplyOrderItem & { product: Product })[] }) | undefined> {
+    const order = this.supplyOrders.get(id);
+    if (!order) return undefined;
+
+    const center = this.purchasingCenters.get(order.centerId);
+    if (!center) return undefined;
+
+    const items = await this.getSupplyOrderItems(id);
+    return { ...order, center, items };
+  }
+
+  async createSupplyOrder(insertOrder: InsertSupplyOrder): Promise<SupplyOrder> {
+    const orderNumber = `SUP-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    const order: SupplyOrder = { 
+      id: this.currentSupplyOrderId++,
+      orderNumber,
+      ...insertOrder,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.supplyOrders.set(order.id, order);
+    return order;
+  }
+
+  async updateSupplyOrderStatus(id: number, status: string, updates?: Partial<InsertSupplyOrder>): Promise<SupplyOrder | undefined> {
+    const order = this.supplyOrders.get(id);
+    if (!order) return undefined;
+    
+    const updated = { 
+      ...order, 
+      status, 
+      ...updates,
+      updatedAt: new Date() 
+    };
+    this.supplyOrders.set(id, updated);
+    return updated;
+  }
+
+  // Supply Order Items
+  async createSupplyOrderItem(insertItem: InsertSupplyOrderItem): Promise<SupplyOrderItem> {
+    const item: SupplyOrderItem = { 
+      id: this.currentSupplyOrderItemId++, 
+      ...insertItem,
+      createdAt: new Date()
+    };
+    
+    const existingItems = this.supplyOrderItems.get(item.orderId) || [];
+    existingItems.push(item);
+    this.supplyOrderItems.set(item.orderId, existingItems);
+    
+    return item;
+  }
+
+  async getSupplyOrderItems(orderId: number): Promise<(SupplyOrderItem & { product: Product })[]> {
+    const items = this.supplyOrderItems.get(orderId) || [];
+    const result: (SupplyOrderItem & { product: Product })[] = [];
+    
+    for (const item of items) {
+      const product = this.products.get(item.productId);
+      if (product) {
+        result.push({ ...item, product });
+      }
+    }
+    return result;
+  }
+
+  private initializePurchasingCenters() {
+    // Centrales d'achat
+    const centers = [
+      {
+        id: 1,
+        name: "Central D'Achat Plateau",
+        address: "Zone Industrielle Plateau, Abidjan",
+        city: "Abidjan",
+        phone: "+225 20 30 40 50",
+        email: "plateau@central-achat.ci",
+        specialties: ["Céréales", "Légumes", "Fruits"],
+        deliveryZones: ["Plateau", "Cocody", "Marcory"],
+        isActive: true,
+        createdAt: new Date("2024-01-15")
+      },
+      {
+        id: 2,
+        name: "Central D'Achat Treichville",
+        address: "Boulevard de Marseille, Treichville",
+        city: "Abidjan",
+        phone: "+225 21 25 30 35",
+        email: "treichville@central-achat.ci",
+        specialties: ["Viandes", "Poissons", "Laitiers"],
+        deliveryZones: ["Treichville", "Port-Bouët", "Koumassi"],
+        isActive: true,
+        createdAt: new Date("2024-01-20")
+      },
+      {
+        id: 3,
+        name: "Central D'Achat Yopougon",
+        address: "Quartier Niangon, Yopougon",
+        city: "Abidjan",
+        phone: "+225 23 45 67 89",
+        email: "yopougon@central-achat.ci",
+        specialties: ["Céréales", "Légumes", "Viandes"],
+        deliveryZones: ["Yopougon", "Abobo", "Anyama"],
+        isActive: true,
+        createdAt: new Date("2024-02-01")
+      }
+    ];
+    centers.forEach(center => this.purchasingCenters.set(center.id, center));
+    this.currentPurchasingCenterId = 4;
+
+    // Produits des centrales
+    const centerProducts = [
+      // Central Plateau - Céréales
+      { id: 1, centerId: 1, productId: 1, unitPrice: "450.00", minOrderQuantity: 10, stockQuantity: 500, deliveryTime: 2, isAvailable: true, lastUpdated: new Date() },
+      // Central Treichville - Riz aussi disponible
+      { id: 2, centerId: 2, productId: 1, unitPrice: "470.00", minOrderQuantity: 5, stockQuantity: 200, deliveryTime: 3, isAvailable: true, lastUpdated: new Date() },
+      // Central Yopougon - Riz également
+      { id: 3, centerId: 3, productId: 1, unitPrice: "440.00", minOrderQuantity: 15, stockQuantity: 800, deliveryTime: 1, isAvailable: true, lastUpdated: new Date() },
+    ];
+    centerProducts.forEach(cp => this.centerProducts.set(cp.id, cp));
+    this.currentCenterProductId = 4;
+
+    // Commandes d'approvisionnement exemple
+    const supplyOrders = [
+      {
+        id: 1,
+        orderNumber: "SUP-2024-001",
+        storeId: 1,
+        centerId: 1,
+        status: "delivered",
+        totalAmount: "4500.00",
+        deliveryDate: new Date("2024-01-25"),
+        trackingNumber: "TRK-001-2024",
+        notes: "Livraison effectuée avec succès",
+        invoiceUrl: "/invoices/SUP-2024-001.pdf",
+        createdAt: new Date("2024-01-20"),
+        updatedAt: new Date("2024-01-25")
+      },
+      {
+        id: 2,
+        orderNumber: "SUP-2024-002",
+        storeId: 1,
+        centerId: 3,
+        status: "shipped",
+        totalAmount: "6600.00",
+        deliveryDate: new Date("2024-02-05"),
+        trackingNumber: "TRK-002-2024",
+        notes: "En cours de livraison",
+        invoiceUrl: null,
+        createdAt: new Date("2024-02-01"),
+        updatedAt: new Date("2024-02-03")
+      }
+    ];
+    supplyOrders.forEach(order => this.supplyOrders.set(order.id, order));
+    this.currentSupplyOrderId = 3;
+
+    // Articles des commandes
+    const orderItems = [
+      // Commande 1
+      [{ id: 1, orderId: 1, productId: 1, quantity: 10, unitPrice: "450.00", totalPrice: "4500.00", createdAt: new Date("2024-01-20") }],
+      // Commande 2
+      [{ id: 2, orderId: 2, productId: 1, quantity: 15, unitPrice: "440.00", totalPrice: "6600.00", createdAt: new Date("2024-02-01") }]
+    ];
+    this.supplyOrderItems.set(1, orderItems[0]);
+    this.supplyOrderItems.set(2, orderItems[1]);
+    this.currentSupplyOrderItemId = 3;
   }
 }
 

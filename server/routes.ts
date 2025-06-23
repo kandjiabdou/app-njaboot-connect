@@ -4,7 +4,8 @@ import { z } from "zod";
 import { storage } from "./storage";
 import { 
   insertUserSchema, insertOrderSchema, insertOrderItemSchema, 
-  insertSaleSchema, insertProductSchema, insertInventorySchema 
+  insertSaleSchema, insertProductSchema, insertInventorySchema,
+  insertSupplyOrderSchema, insertSupplyOrderItemSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -377,6 +378,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(notification);
     } catch (error) {
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Supply Management Routes
+  
+  // Get purchasing centers
+  app.get("/api/purchasing-centers", async (req, res) => {
+    try {
+      const centers = await storage.getPurchasingCenters();
+      res.json(centers);
+    } catch (error) {
+      console.error("Error fetching purchasing centers:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Get products for a purchasing center
+  app.get("/api/center-products/:centerId", async (req, res) => {
+    try {
+      const { centerId } = req.params;
+      const products = await storage.getCenterProducts(parseInt(centerId));
+      res.json(products);
+    } catch (error) {
+      console.error("Error fetching center products:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Get supply orders for a store
+  app.get("/api/supply-orders/:storeId", async (req, res) => {
+    try {
+      const { storeId } = req.params;
+      const orders = await storage.getSupplyOrders(parseInt(storeId));
+      res.json(orders);
+    } catch (error) {
+      console.error("Error fetching supply orders:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Create supply order
+  app.post("/api/supply-orders", async (req, res) => {
+    try {
+      const { items, ...orderData } = req.body;
+      
+      // Validate order data
+      const validatedOrder = insertSupplyOrderSchema.parse(orderData);
+      
+      // Create the order
+      const order = await storage.createSupplyOrder(validatedOrder);
+      
+      // Create order items
+      for (const item of items) {
+        const validatedItem = insertSupplyOrderItemSchema.parse({
+          ...item,
+          orderId: order.id,
+          totalPrice: item.quantity * item.unitPrice
+        });
+        await storage.createSupplyOrderItem(validatedItem);
+      }
+      
+      res.status(201).json(order);
+    } catch (error) {
+      console.error("Error creating supply order:", error);
+      if (error instanceof Error && error.name === "ZodError") {
+        return res.status(400).json({ message: "Données invalides", errors: error });
+      }
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Update supply order status
+  app.patch("/api/supply-orders/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, ...updates } = req.body;
+      
+      const order = await storage.updateSupplyOrderStatus(parseInt(id), status, updates);
+      
+      if (!order) {
+        return res.status(404).json({ message: "Commande non trouvée" });
+      }
+      
+      res.json(order);
+    } catch (error) {
+      console.error("Error updating supply order status:", error);
+      res.status(500).json({ message: "Erreur serveur" });
+    }
+  });
+
+  // Get store by manager ID for supply management
+  app.get("/api/stores/manager/:managerId", async (req, res) => {
+    try {
+      const { managerId } = req.params;
+      const store = await storage.getStoreByManagerId(parseInt(managerId));
+      
+      if (!store) {
+        return res.status(404).json({ message: "Boutique non trouvée" });
+      }
+      
+      res.json(store);
+    } catch (error) {
+      console.error("Error fetching store by manager:", error);
       res.status(500).json({ message: "Erreur serveur" });
     }
   });

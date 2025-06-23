@@ -16,7 +16,7 @@ import { useCart } from "@/hooks/use-cart";
 import { 
   Store, Bell, ShoppingCart, User, LogOut, Settings, Menu,
   BarChart3, Package, Users, TrendingUp, ShoppingBag, Cog, MapPin,
-  Star, CreditCard, Home
+  Star, CreditCard, Home, Truck
 } from "lucide-react";
 
 export default function UnifiedNavbar() {
@@ -31,12 +31,13 @@ export default function UnifiedNavbar() {
   };
 
   const managerLinks = [
-    { href: "/manager/dashboard", label: "Tableau de Bord", icon: BarChart3 },
+    { href: "/manager", label: "Tableau de bord", icon: BarChart3 },
+    { href: "/manager/orders", label: "Commandes", icon: ShoppingBag },
     { href: "/manager/inventory", label: "Inventaire", icon: Package },
+    { href: "/manager/supply", label: "Approvisionnement", icon: Truck },
     { href: "/manager/sales", label: "Ventes", icon: TrendingUp },
     { href: "/manager/customers", label: "Clients", icon: Users },
-    { href: "/manager/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/manager/settings", label: "Paramètres", icon: Cog },
+    { href: "/manager/analytics", label: "Analyses", icon: BarChart3 },
   ];
 
   const customerLinks = [

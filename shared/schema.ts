@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, decimal, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, integer, boolean, timestamp, decimal, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -145,6 +145,82 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   createdAt: true,
 });
 
+// Centrales d'achat (entrepôts d'approvisionnement)
+export const purchasingCenters = pgTable("purchasing_centers", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  address: text("address").notNull(),
+  city: varchar("city", { length: 100 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  email: varchar("email", { length: 255 }),
+  specialties: text("specialties").array(), // Spécialités produits
+  deliveryZones: text("delivery_zones").array(), // Zones de livraison
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Catalogue des produits disponibles par centrale
+export const centerProducts = pgTable("center_products", {
+  id: serial("id").primaryKey(),
+  centerId: integer("center_id").notNull().references(() => purchasingCenters.id),
+  productId: integer("product_id").notNull().references(() => products.id),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  minOrderQuantity: integer("min_order_quantity").default(1).notNull(),
+  stockQuantity: integer("stock_quantity").default(0).notNull(),
+  deliveryTime: integer("delivery_time_days").default(3).notNull(), // en jours
+  isAvailable: boolean("is_available").default(true).notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow().notNull(),
+});
+
+// Commandes d'approvisionnement
+export const supplyOrders = pgTable("supply_orders", {
+  id: serial("id").primaryKey(),
+  orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+  storeId: integer("store_id").notNull().references(() => stores.id),
+  centerId: integer("center_id").notNull().references(() => purchasingCenters.id),
+  status: varchar("status", { length: 50 }).default("pending").notNull(), // pending, confirmed, shipped, delivered, cancelled
+  totalAmount: decimal("total_amount", { precision: 10, scale: 2 }).notNull(),
+  deliveryDate: timestamp("delivery_date"),
+  trackingNumber: varchar("tracking_number", { length: 100 }),
+  notes: text("notes"),
+  invoiceUrl: varchar("invoice_url", { length: 500 }), // URL de la facture
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Articles des commandes d'approvisionnement
+export const supplyOrderItems = pgTable("supply_order_items", {
+  id: serial("id").primaryKey(),
+  orderId: integer("order_id").notNull().references(() => supplyOrders.id),
+  productId: integer("product_id").notNull().references(() => products.id),
+  quantity: integer("quantity").notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertPurchasingCenterSchema = createInsertSchema(purchasingCenters).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCenterProductSchema = createInsertSchema(centerProducts).omit({
+  id: true,
+  lastUpdated: true,
+});
+
+export const insertSupplyOrderSchema = createInsertSchema(supplyOrders).omit({
+  id: true,
+  orderNumber: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSupplyOrderItemSchema = createInsertSchema(supplyOrderItems).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -166,3 +242,11 @@ export type LoyaltyPoints = typeof loyaltyPoints.$inferSelect;
 export type InsertLoyaltyPoints = z.infer<typeof insertLoyaltyPointsSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type PurchasingCenter = typeof purchasingCenters.$inferSelect;
+export type InsertPurchasingCenter = z.infer<typeof insertPurchasingCenterSchema>;
+export type CenterProduct = typeof centerProducts.$inferSelect;
+export type InsertCenterProduct = z.infer<typeof insertCenterProductSchema>;
+export type SupplyOrder = typeof supplyOrders.$inferSelect;
+export type InsertSupplyOrder = z.infer<typeof insertSupplyOrderSchema>;
+export type SupplyOrderItem = typeof supplyOrderItems.$inferSelect;
+export type InsertSupplyOrderItem = z.infer<typeof insertSupplyOrderItemSchema>;
