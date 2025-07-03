@@ -13,8 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
-import { useTheme } from "@/hooks/use-theme";
-import { getNavigationColors } from "@/lib/theme";
 import { 
   Store, Bell, ShoppingCart, User, LogOut, Settings, Menu,
   BarChart3, Package, Users, TrendingUp, ShoppingBag, Cog, MapPin,
@@ -24,12 +22,8 @@ import {
 export default function UnifiedNavbar() {
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
-  const { role } = useTheme();
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
-  // Get navigation colors based on user role
-  const navColors = getNavigationColors(role);
 
   const handleLogout = () => {
     logout();
@@ -58,29 +52,12 @@ export default function UnifiedNavbar() {
   const getCurrentLinks = () => {
     if (!user) return customerLinks;
     
-    // Show all links based on user role, not current route
-    if (user.role === "manager") {
-      // Managers see both their manager tools AND customer tools
-      return location.startsWith("/manager") ? managerLinks : customerLinks;
+    // Show manager links only when on manager routes
+    if (location.startsWith("/manager")) {
+      return managerLinks;
     }
     
-    // Customers always see customer links
-    return customerLinks;
-  };
-
-  // Get all navigation links for mobile menu (no restrictions)
-  const getAllLinksForMobile = () => {
-    if (!user) return customerLinks;
-    
-    if (user.role === "manager") {
-      // In mobile, managers see ALL their available sections
-      return [
-        ...managerLinks,
-        { href: "/", label: "─── Vue Client ───", icon: ShoppingCart, isSection: true },
-        ...customerLinks
-      ];
-    }
-    
+    // Default to customer links for all other routes
     return customerLinks;
   };
 
@@ -123,32 +100,17 @@ export default function UnifiedNavbar() {
   }
 
   return (
-    <nav 
-      className="shadow-sm border-b"
-      style={{ 
-        backgroundColor: navColors.background,
-        borderColor: role === 'manager' ? '#374151' : '#E5E5E5'
-      }}
-    >
+    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           {/* Logo */}
           <div className="flex items-center">
             <Link href={location.startsWith("/manager") ? "/manager/dashboard" : "/"}>
               <div className="flex-shrink-0 flex items-center">
-                <div 
-                  className="h-8 w-8 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: navColors.accent }}
-                >
-                  <Store 
-                    className="h-5 w-5" 
-                    style={{ color: role === 'manager' ? '#041B26' : '#FFFFFF' }}
-                  />
+                <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Store className="h-5 w-5 text-white" />
                 </div>
-                <span 
-                  className="ml-2 text-xl font-bold"
-                  style={{ color: navColors.text }}
-                >
+                <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
                   Njaboot Connect
                 </span>
               </div>
@@ -159,42 +121,17 @@ export default function UnifiedNavbar() {
           <div className="hidden md:flex items-center space-x-4">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
-              const isActive = isActiveLink(link.href);
               return (
                 <Link key={link.href} href={link.href}>
                   <Button
-                    variant={isActive ? "default" : "ghost"}
+                    variant={isActiveLink(link.href) ? "default" : "ghost"}
                     size="sm"
                     className="flex items-center gap-2"
-                    style={isActive ? {
-                      backgroundColor: navColors.accent,
-                      color: role === 'manager' ? '#041B26' : '#FFFFFF'
-                    } : {
-                      color: navColors.text,
-                      backgroundColor: 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = navColors.hover + '20';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                      }
-                    }}
                   >
                     <Icon className="h-4 w-4" />
                     {link.label}
                     {link.href === "/cart" && totalItems > 0 && (
-                      <Badge 
-                        variant="secondary" 
-                        className="ml-1 text-xs"
-                        style={{ 
-                          backgroundColor: navColors.accent,
-                          color: role === 'manager' ? '#041B26' : '#FFFFFF'
-                        }}
-                      >
+                      <Badge variant="secondary" className="ml-1 text-xs">
                         {totalItems}
                       </Badge>
                     )}
@@ -343,18 +280,8 @@ export default function UnifiedNavbar() {
 
                   {/* Navigation links */}
                   <div className="space-y-2">
-                    {getAllLinksForMobile().map((link) => {
+                    {getCurrentLinks().map((link) => {
                       const Icon = link.icon;
-                      
-                      // Section separator for managers
-                      if (link.isSection) {
-                        return (
-                          <div key={link.href} className="py-2 text-center text-xs text-gray-500 font-medium">
-                            {link.label}
-                          </div>
-                        );
-                      }
-                      
                       return (
                         <Link key={link.href} href={link.href}>
                           <Button
