@@ -209,28 +209,6 @@ export default function UnifiedNavbar() {
                 </div>
                 <DropdownMenuSeparator />
                 
-                {/* Role Switch in Mobile Menu - Only show for managers */}
-                {user.role === "manager" && (
-                  <div className="md:hidden">
-                    {location.startsWith("/manager") ? (
-                      <Link href="/">
-                        <DropdownMenuItem>
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          <span>Vue Client</span>
-                        </DropdownMenuItem>
-                      </Link>
-                    ) : (
-                      <Link href="/manager/dashboard">
-                        <DropdownMenuItem>
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          <span>Vue Gérant</span>
-                        </DropdownMenuItem>
-                      </Link>
-                    )}
-                    <DropdownMenuSeparator />
-                  </div>
-                )}
-                
                 <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
@@ -277,6 +255,35 @@ export default function UnifiedNavbar() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Role Switch Buttons - Only show for managers */}
+                  {user.role === "manager" && (
+                    <div className="space-y-2 pb-4 border-b">
+                      {location.startsWith("/manager") ? (
+                        <Link href="/">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <ShoppingCart className="mr-2 h-4 w-4" />
+                            Vue Client
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link href="/manager/dashboard">
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            Vue Gérant
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
+                  )}
 
                   {/* Navigation links */}
                   <div className="space-y-2">
