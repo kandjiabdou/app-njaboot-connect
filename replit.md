@@ -88,7 +88,20 @@ The application is designed to run in Replit's environment with specific configu
 
 ## Changelog
 - June 23, 2025. Initial setup
+- January 3, 2025. Brand color system implemented with design tokens and theme management
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+
+## Brand Identity
+
+### Official Colors
+- **Primary**: Jaune (#FBB03B), Vert (#258C42)  
+- **Secondary**: Noir (#041B26 ou #000000), Blanc (#FFFFFF), Gris (#E5E5E5)
+
+### Theme System
+- **Manager**: Dominant noir/jaune, navigation noir avec accents jaunes
+- **Customer**: Dominant jaune/noir, navigation jaune avec accents verts
+- Système automatique de thèmes basé sur le rôle utilisateur
+- Variables CSS centralisées pour maintenance facile

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,6 @@ import {
   Map,
   Star,
   Filter,
-  ExternalLink,
 } from "lucide-react";
 
 interface Store {
@@ -273,7 +271,11 @@ export default function StoreFinder() {
                       <Navigation className="h-4 w-4 mr-2" />
                       Itinéraire
                     </Button>
-                    <Button size="sm" className="whitespace-nowrap">
+                    <Button
+                      size="sm"
+                      className="whitespace-nowrap"
+                      onClick={() => window.location.href = `/store/${store.id}`}
+                    >
                       Voir Détails
                     </Button>
                   </div>
