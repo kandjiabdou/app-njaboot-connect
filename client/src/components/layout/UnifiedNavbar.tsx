@@ -48,19 +48,11 @@ export default function UnifiedNavbar() {
     { href: "/stores", label: "Boutiques", icon: MapPin },
     { href: "/loyalty", label: "Fidélité", icon: Star },
     { href: "/debt", label: "Crédit", icon: CreditCard },
-    { href: "/cart", label: "Panier", icon: ShoppingCart },
   ];
 
   const getCurrentLinks = () => {
-    if (!user) return customerLinks;
-    
-    // Show manager links only when on manager routes
-    if (location.startsWith("/manager")) {
-      return managerLinks;
-    }
-    
-    // Default to customer links for all other routes
-    return customerLinks;
+    if (!user) return [];
+    return user.role === "manager" ? managerLinks : customerLinks;
   };
 
   const isActiveLink = (href: string) => {
@@ -69,24 +61,20 @@ export default function UnifiedNavbar() {
     return false;
   };
 
+  // Guest navbar
   if (!user) {
     return (
-      <nav className="bg-[#FBB03B] shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/">
-                <div className="flex-shrink-0 flex items-center">
-                  <div className="h-8 w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
-                    <Store className="h-5 w-5 text-white" />
-                  </div>
-                  <span className="ml-2 text-xl font-bold text-black">
-                    Njaboot Connect
-                  </span>
+      <nav className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Link href="/">
+              <div className="flex items-center">
+                <div className="h-8 w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
+                  <Store className="h-5 w-5 text-white" />
                 </div>
-              </Link>
-            </div>
-            
+                <span className="ml-2 text-xl font-bold text-gray-900">Njaboot Connect</span>
+              </div>
+            </Link>
             <div className="flex items-center space-x-4">
               <Link href="/login">
                 <Button variant="ghost" className="text-black hover:bg-black/10">Se connecter</Button>
@@ -103,11 +91,11 @@ export default function UnifiedNavbar() {
 
   return (
     <nav className={navbar.navbar}>
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
-        <div className="flex justify-between items-center h-16 min-w-0">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="flex justify-between items-center h-16 gap-4">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
-            <Link href={location.startsWith("/manager") ? "/manager/dashboard" : "/"}>
+            <Link href={location.startsWith("/manager") ? "/manager" : "/"}>
               <div className="flex items-center">
                 <div className="h-6 w-6 lg:h-8 lg:w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
                   <Store className="h-3 w-3 lg:h-5 lg:w-5 text-white" />
@@ -120,8 +108,8 @@ export default function UnifiedNavbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 xl:space-x-4 flex-1 justify-center max-w-2xl mx-4">
+          {/* Desktop Navigation - Full size (XL and up) */}
+          <div className="hidden xl:flex items-center space-x-3 flex-1 justify-center overflow-hidden mx-4">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
               const isActive = isActiveLink(link.href);
@@ -130,20 +118,61 @@ export default function UnifiedNavbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 text-xs lg:text-sm whitespace-nowrap ${
+                    className={`flex items-center gap-2 px-3 text-sm whitespace-nowrap ${
                       isActive 
                         ? navbar.navTextActive 
                         : `${navbar.navText} ${navbar.navHover}`
                     }`}
                   >
-                    <Icon className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
-                    <span className="hidden lg:inline">{link.label}</span>
-                    <span className="lg:hidden">{link.label.split(' ')[0]}</span>
-                    {link.href === "/cart" && totalItems > 0 && (
-                      <Badge variant="secondary" className="ml-1 text-xs h-4 w-4 p-0 flex items-center justify-center">
-                        {totalItems}
-                      </Badge>
-                    )}
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span>{link.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop Navigation - Medium size (LG to XL) */}
+          <div className="hidden lg:flex xl:hidden items-center space-x-1 flex-1 justify-center overflow-hidden mx-2">
+            {getCurrentLinks().map((link) => {
+              const Icon = link.icon;
+              const isActive = isActiveLink(link.href);
+              return (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex items-center gap-1 px-2 text-xs whitespace-nowrap ${
+                      isActive 
+                        ? navbar.navTextActive 
+                        : `${navbar.navText} ${navbar.navHover}`
+                    }`}
+                  >
+                    <Icon className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{link.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Desktop Navigation - Compact (MD to LG) */}
+          <div className="hidden md:flex lg:hidden items-center space-x-1 flex-1 justify-center overflow-hidden mx-1">
+            {getCurrentLinks().slice(0, 5).map((link) => {
+              const Icon = link.icon;
+              const isActive = isActiveLink(link.href);
+              return (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`flex items-center gap-1 px-1 text-xs whitespace-nowrap ${
+                      isActive 
+                        ? navbar.navTextActive 
+                        : `${navbar.navText} ${navbar.navHover}`
+                    }`}
+                  >
+                    <Icon className="h-3 w-3 flex-shrink-0" />
                   </Button>
                 </Link>
               );
@@ -151,24 +180,22 @@ export default function UnifiedNavbar() {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-1 lg:space-x-2 xl:space-x-4">
+          <div className="flex items-center space-x-1 lg:space-x-2 flex-shrink-0">
             {/* Role Switch Button - Only show for managers */}
             {user.role === "manager" && (
               <div className="hidden md:block">
                 {location.startsWith("/manager") ? (
                   <Link href="/">
-                    <Button variant="outline" size="sm" className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm ${navbar.buttonOutline}`}>
-                      <ShoppingCart className="h-3 w-3 lg:h-4 lg:w-4" />
+                    <Button variant="outline" size="sm" className={`flex items-center gap-1 px-2 text-xs ${navbar.buttonOutline}`}>
+                      <ShoppingCart className="h-3 w-3" />
                       <span className="hidden lg:inline">Vue Client</span>
-                      <span className="lg:hidden">Client</span>
                     </Button>
                   </Link>
                 ) : (
-                  <Link href="/manager/dashboard">
-                    <Button variant="outline" size="sm" className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm ${navbar.buttonOutline}`}>
-                      <BarChart3 className="h-3 w-3 lg:h-4 lg:w-4" />
+                  <Link href="/manager">
+                    <Button variant="outline" size="sm" className={`flex items-center gap-1 px-2 text-xs ${navbar.buttonOutline}`}>
+                      <BarChart3 className="h-3 w-3" />
                       <span className="hidden lg:inline">Vue Gérant</span>
-                      <span className="lg:hidden">Gérant</span>
                     </Button>
                   </Link>
                 )}
@@ -179,11 +206,11 @@ export default function UnifiedNavbar() {
             {!location.startsWith("/manager") && (
               <Link href="/cart" className="hidden md:block">
                 <Button variant="ghost" size="sm" className={`relative p-2 ${navbar.buttonGhost}`}>
-                  <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
+                  <ShoppingCart className="h-4 w-4" />
                   {totalItems > 0 && (
                     <Badge 
                       variant="destructive" 
-                      className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center text-xs"
+                      className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center text-xs"
                     >
                       {totalItems}
                     </Badge>
@@ -193,19 +220,17 @@ export default function UnifiedNavbar() {
             )}
 
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className={`p-2 ${navbar.buttonGhost}`}>
-              <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
+            <Button variant="ghost" size="sm" className={`p-2 hidden md:block ${navbar.buttonGhost}`}>
+              <Bell className="h-4 w-4" />
             </Button>
 
-            {/* User menu */}
+            {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button variant="ghost" className={`relative h-8 w-8 rounded-full ${navbar.buttonGhost}`}>
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="" alt={user.firstName} />
-                    <AvatarFallback>
-                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                    </AvatarFallback>
+                    <AvatarImage src="/avatars/01.png" alt="@user" />
+                    <AvatarFallback>{user.firstName?.[0] || 'U'}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -219,21 +244,18 @@ export default function UnifiedNavbar() {
                   </div>
                 </div>
                 <DropdownMenuSeparator />
-                
-                <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
-                  <DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="w-full">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
-                  </DropdownMenuItem>
-                </Link>
-                {location.startsWith("/manager") && (
-                  <Link href="/manager/settings">
-                    <DropdownMenuItem>
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>Paramètres</span>
-                    </DropdownMenuItem>
                   </Link>
-                )}
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/settings" className="w-full">
+                    <Cog className="mr-2 h-4 w-4" />
+                    <span>Paramètres</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -242,107 +264,98 @@ export default function UnifiedNavbar() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Mobile menu button */}
+            {/* Mobile menu */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className={`md:hidden ${navbar.buttonGhost}`}>
-                  <Menu className="h-5 w-5" />
+                <Button
+                  variant="ghost"
+                  className={`inline-flex items-center justify-center p-2 rounded-md md:hidden ${navbar.buttonGhost}`}
+                  aria-expanded="false"
+                >
+                  <span className="sr-only">Ouvrir le menu principal</span>
+                  <Menu className="block h-5 w-5" aria-hidden="true" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <div className="flex flex-col space-y-4 mt-4">
-                  {/* User info */}
-                  <div className="flex items-center space-x-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src="" alt={user.firstName} />
-                      <AvatarFallback>
-                        {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.firstName} {user.lastName}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        {user.role === "manager" ? "Gestionnaire" : "Client"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Role Switch Buttons - Only show for managers */}
-                  {user.role === "manager" && (
-                    <div className="space-y-2 pb-4 border-b">
-                      {location.startsWith("/manager") ? (
-                        <Link href="/">
-                          <Button 
-                            variant="outline" 
-                            className={`w-full justify-start ${navbar.buttonOutline}`}
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <ShoppingCart className="mr-2 h-4 w-4" />
-                            Vue Client
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link href="/manager/dashboard">
-                          <Button 
-                            variant="outline" 
-                            className={`w-full justify-start ${navbar.buttonOutline}`}
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            <BarChart3 className="mr-2 h-4 w-4" />
-                            Vue Gérant
-                          </Button>
-                        </Link>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Navigation links */}
-                  <div className="space-y-2">
+                  {/* Navigation Links */}
+                  <div className="space-y-1">
                     {getCurrentLinks().map((link) => {
                       const Icon = link.icon;
                       const isActive = isActiveLink(link.href);
                       return (
                         <Link key={link.href} href={link.href}>
                           <Button
-                            variant="ghost"
-                            className={`w-full justify-start ${
-                              isActive 
-                                ? navbar.navTextActive 
-                                : navbar.navText
-                            }`}
+                            variant={isActive ? "secondary" : "ghost"}
+                            className="w-full justify-start"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="mr-2 h-4 w-4" />
                             {link.label}
-                            {link.href === "/cart" && totalItems > 0 && (
-                              <Badge variant="secondary" className="ml-auto">
-                                {totalItems}
-                              </Badge>
-                            )}
                           </Button>
                         </Link>
                       );
                     })}
                   </div>
 
-                  <div className="border-t pt-4 space-y-2">
-                    <Link href={location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
-                      <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
+                  {/* Role Switch Buttons for Managers */}
+                  {user.role === "manager" && (
+                    <div className="border-t pt-4 space-y-2">
+                      <p className="text-sm font-medium text-gray-600 px-3">Vues</p>
+                      <Link href="/">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Vue Client
+                        </Button>
+                      </Link>
+                      <Link href="/manager">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <BarChart3 className="mr-2 h-4 w-4" />
+                          Vue Gérant
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  {/* Cart for customers */}
+                  {!location.startsWith("/manager") && (
+                    <div className="border-t pt-4">
+                      <Link href="/cart">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <ShoppingCart className="mr-2 h-4 w-4" />
+                          Panier {totalItems > 0 && `(${totalItems})`}
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+
+                  {/* User Actions */}
+                  <div className="border-t pt-4 space-y-1">
+                    <Link href="/profile">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
                         <User className="mr-2 h-4 w-4" />
                         Profil
                       </Button>
                     </Link>
-                    {location.startsWith("/manager") && (
-                      <Link href="/manager/settings">
-                        <Button variant="ghost" className="w-full justify-start" onClick={() => setMobileMenuOpen(false)}>
-                          <Settings className="mr-2 h-4 w-4" />
-                          Paramètres
-                        </Button>
-                      </Link>
-                    )}
-                    <Button 
-                      variant="ghost" 
-                      className="w-full justify-start text-red-600 hover:text-red-700" 
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
                       onClick={handleLogout}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
