@@ -158,26 +158,7 @@ export default function UnifiedNavbar() {
 
           {/* Right side */}
           <div className="flex items-center space-x-1 lg:space-x-2 flex-shrink-0">
-            {/* Role Switch Button - Only show for managers */}
-            {user.role === "manager" && (
-              <div className="hidden md:block">
-                {location.startsWith("/manager") ? (
-                  <Link href="/">
-                    <Button variant="outline" size="sm" className={`flex items-center gap-1 px-2 text-xs ${navbar.buttonOutline}`}>
-                      <ShoppingCart className="h-3 w-3" />
-                      <span className="hidden lg:inline">Vue Client</span>
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/manager">
-                    <Button variant="outline" size="sm" className={`flex items-center gap-1 px-2 text-xs ${navbar.buttonOutline}`}>
-                      <BarChart3 className="h-3 w-3" />
-                      <span className="hidden lg:inline">Vue Gérant</span>
-                    </Button>
-                  </Link>
-                )}
-              </div>
-            )}
+
 
             {/* Cart (desktop only) - Show for all users when not on manager routes */}
             {!location.startsWith("/manager") && (
@@ -279,32 +260,7 @@ export default function UnifiedNavbar() {
                     })}
                   </div>
 
-                  {/* Role Switch Buttons for Managers */}
-                  {user.role === "manager" && (
-                    <div className="border-t pt-4 space-y-2">
-                      <p className="text-sm font-medium text-gray-600 px-3">Vues</p>
-                      <Link href="/">
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <ShoppingCart className="mr-2 h-4 w-4" />
-                          Vue Client
-                        </Button>
-                      </Link>
-                      <Link href="/manager">
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <BarChart3 className="mr-2 h-4 w-4" />
-                          Vue Gérant
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
+
 
                   {/* Cart for customers */}
                   {!location.startsWith("/manager") && (

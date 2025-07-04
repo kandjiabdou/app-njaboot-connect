@@ -90,6 +90,9 @@ The application is designed to run in Replit's environment with specific configu
 - June 23, 2025. Initial setup
 - January 3, 2025. Brand color system implemented with design tokens and theme management
 - January 3, 2025. Comprehensive theme system applied to navigation and home pages with role-based styling
+- January 3, 2025. Role-based navigation system implemented - users see appropriate menus based on login credentials
+- January 3, 2025. Removed manual view switcher buttons ("Vue Gérant"/"Vue Client") - navigation now automatic based on user role
+- January 3, 2025. Fixed LoyaltyPoints page crash by improving data safety checks
 
 ## User Preferences
 
