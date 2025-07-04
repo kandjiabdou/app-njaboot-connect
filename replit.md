@@ -93,6 +93,7 @@ The application is designed to run in Replit's environment with specific configu
 - January 3, 2025. Role-based navigation system implemented - users see appropriate menus based on login credentials
 - January 3, 2025. Removed manual view switcher buttons ("Vue Gérant"/"Vue Client") - navigation now automatic based on user role
 - January 3, 2025. Fixed LoyaltyPoints page crash by improving data safety checks
+- January 3, 2025. Implemented interactive map for store locations using Leaflet library with realistic Dakar coordinates
 
 ## User Preferences
 

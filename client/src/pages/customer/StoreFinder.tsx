@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import InteractiveMap from "@/components/common/InteractiveMap";
 import {
   MapPin,
   Search,
@@ -40,29 +41,29 @@ export default function StoreFinder() {
     queryKey: ["/api/stores"],
   });
 
-  // Mock store data with coordinates for demonstration
+  // Mock store data with realistic coordinates for Dakar, Sénégal
   const mockStores: Store[] = [
     {
       id: 1,
-      name: "Njaboot Connect Dakar Centre",
-      address: "Avenue Léopold Sédar Senghor, Dakar",
+      name: "Njaboot Connect Plateau",
+      address: "Place de l'Indépendance, Plateau, Dakar",
       phone: "+221 33 123 45 67",
       isActive: true,
       distance: 0.8,
       rating: 4.5,
       hours: "8h00 - 20h00",
-      coordinates: { lat: 14.6937, lng: -17.4441 },
+      coordinates: { lat: 14.6937, lng: -17.4441 }, // Centre-ville Plateau
     },
     {
       id: 2,
       name: "Njaboot Connect Almadies",
-      address: "Route des Almadies, Dakar",
+      address: "Route des Almadies, Ngor-Almadies",
       phone: "+221 33 234 56 78",
       isActive: true,
-      distance: 2.3,
+      distance: 12.3,
       rating: 4.3,
       hours: "9h00 - 19h00",
-      coordinates: { lat: 14.7167, lng: -17.4833 },
+      coordinates: { lat: 14.7167, lng: -17.4833 }, // Almadies
     },
     {
       id: 3,
@@ -70,10 +71,10 @@ export default function StoreFinder() {
       address: "Avenue Cheikh Ahmadou Bamba, Pikine",
       phone: "+221 33 345 67 89",
       isActive: true,
-      distance: 5.1,
+      distance: 15.1,
       rating: 4.1,
       hours: "8h30 - 19h30",
-      coordinates: { lat: 14.7547, lng: -17.3906 },
+      coordinates: { lat: 14.7547, lng: -17.3906 }, // Pikine
     },
     {
       id: 4,
@@ -81,21 +82,54 @@ export default function StoreFinder() {
       address: "Route de Rufisque, Guédiawaye",
       phone: "+221 33 456 78 90",
       isActive: true,
-      distance: 7.2,
+      distance: 18.2,
       rating: 4.0,
       hours: "8h00 - 18h00",
-      coordinates: { lat: 14.7692, lng: -17.4019 },
+      coordinates: { lat: 14.7692, lng: -17.4019 }, // Guédiawaye
     },
     {
       id: 5,
-      name: "Njaboot Connect Thiès",
-      address: "Avenue Général de Gaulle, Thiès",
+      name: "Njaboot Connect Parcelles Assainies",
+      address: "Route des Parcelles Assainies, Dakar",
       phone: "+221 33 567 89 01",
       isActive: true,
-      distance: 67.5,
+      distance: 13.5,
       rating: 4.2,
       hours: "8h00 - 19h00",
-      coordinates: { lat: 14.7886, lng: -16.9355 },
+      coordinates: { lat: 14.7845, lng: -17.4234 }, // Parcelles Assainies
+    },
+    {
+      id: 6,
+      name: "Njaboot Connect Liberté 6",
+      address: "HLM Liberté 6, Dakar",
+      phone: "+221 33 678 90 12",
+      isActive: true,
+      distance: 8.7,
+      rating: 4.4,
+      hours: "8h30 - 19h30",
+      coordinates: { lat: 14.7234, lng: -17.4556 }, // Liberté 6
+    },
+    {
+      id: 7,
+      name: "Njaboot Connect Medina",
+      address: "Marché Medina, Dakar",
+      phone: "+221 33 789 01 23",
+      isActive: true,
+      distance: 3.2,
+      rating: 4.1,
+      hours: "7h00 - 18h00",
+      coordinates: { lat: 14.6833, lng: -17.4500 }, // Medina
+    },
+    {
+      id: 8,
+      name: "Njaboot Connect Grand Yoff",
+      address: "Route de l'Aéroport, Grand Yoff",
+      phone: "+221 33 890 12 34",
+      isActive: true,
+      distance: 11.8,
+      rating: 4.0,
+      hours: "8h00 - 19h00",
+      coordinates: { lat: 14.7500, lng: -17.4667 }, // Grand Yoff
     },
   ];
 
@@ -289,17 +323,14 @@ export default function StoreFinder() {
         <TabsContent value="map">
           <Card className="h-96 md:h-[500px]">
             <CardContent className="p-0 h-full">
-              <div className="h-full bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-                <div className="text-center space-y-2">
-                  <Map className="h-12 w-12 text-gray-400 mx-auto" />
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Intégration carte interactive à venir
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-500">
-                    Utilisez la vue liste pour voir toutes les boutiques
-                  </p>
-                </div>
-              </div>
+              <InteractiveMap
+                stores={sortedStores}
+                userLocation={userLocation}
+                onStoreSelect={(store) => {
+                  // Option: scroll to store in list or show details
+                  console.log('Store selected:', store.name);
+                }}
+              />
             </CardContent>
           </Card>
         </TabsContent>
