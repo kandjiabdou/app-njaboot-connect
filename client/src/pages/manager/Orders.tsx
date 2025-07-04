@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { formatCurrency, formatDateTime, getOrderStatusLabel, getOrderStatusClassName } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
-import { Package, Truck, Clock, CheckCircle, XCircle, Eye } from "lucide-react";
+import { Package, Truck, Clock, CheckCircle, XCircle, Eye, ShoppingBag, User } from "lucide-react";
 
 export default function ManagerOrders() {
   const { user } = useAuth();
@@ -36,7 +36,7 @@ export default function ManagerOrders() {
       queryClient.invalidateQueries({ queryKey: [`/api/orders`] });
       toast({
         title: "Commande mise à jour",
-        description: "Le statut de la commande a été modifié.",
+        description: "Le statut de la commande a été modifié avec succès.",
       });
     },
     onError: () => {
@@ -52,303 +52,287 @@ export default function ManagerOrders() {
     updateOrderMutation.mutate({ orderId, status: newStatus });
   };
 
-  const filteredOrders = orders?.filter((order: any) => 
-    statusFilter === "all" || order.status === statusFilter
-  ) || [];
+  // Filter orders based on status
+  const filteredOrders = orders?.filter((order: any) => {
+    if (statusFilter === "all") return true;
+    return order.status === statusFilter;
+  }) || [];
 
   const getStatusIcon = (status: string) => {
+    const iconClass = "h-5 w-5 text-white";
     switch (status) {
       case "pending":
-        return <Clock className="h-4 w-4" />;
+        return <Clock className={iconClass} />;
       case "preparing":
-        return <Package className="h-4 w-4" />;
+        return <Package className={iconClass} />;
       case "ready":
-        return <CheckCircle className="h-4 w-4" />;
+        return <CheckCircle className={iconClass} />;
       case "delivered":
-        return <Truck className="h-4 w-4" />;
+        return <Truck className={iconClass} />;
       case "cancelled":
-        return <XCircle className="h-4 w-4" />;
+        return <XCircle className={iconClass} />;
       default:
-        return <Package className="h-4 w-4" />;
+        return <Clock className={iconClass} />;
     }
   };
 
   const getNextStatus = (currentStatus: string) => {
-    switch (currentStatus) {
-      case "pending":
-        return "preparing";
-      case "preparing":
-        return "ready";
-      case "ready":
-        return "delivered";
-      default:
-        return null;
-    }
+    const statusFlow = {
+      pending: "preparing",
+      preparing: "ready",
+      ready: "delivered",
+    };
+    return statusFlow[currentStatus as keyof typeof statusFlow] || null;
   };
 
   const getNextStatusLabel = (currentStatus: string) => {
-    const nextStatus = getNextStatus(currentStatus);
-    return nextStatus ? getOrderStatusLabel(nextStatus) : null;
+    const labels = {
+      pending: "Commencer préparation",
+      preparing: "Marquer comme prête",
+      ready: "Marquer comme livrée",
+    };
+    return labels[currentStatus as keyof typeof labels] || "";
   };
 
   if (ordersLoading) {
     return (
       <ManagerLayout>
-        <LoadingSpinner size="lg" className="min-h-[400px]" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <LoadingSpinner size="lg" />
+        </div>
       </ManagerLayout>
     );
   }
 
   return (
     <ManagerLayout>
-        
-        <main className="flex-1 p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <main className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
               Gestion des Commandes
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Suivez et gérez les commandes de vos clients
+              Suivez et gérez toutes vos commandes
             </p>
           </div>
+        </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-5 w-5 text-yellow-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">En attente</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
-                      {orders?.filter((o: any) => o.status === "pending").length || 0}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Package className="h-5 w-5 text-blue-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">En préparation</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
-                      {orders?.filter((o: any) => o.status === "preparing").length || 0}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Prêtes</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
-                      {orders?.filter((o: any) => o.status === "ready").length || 0}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-2">
-                  <Truck className="h-5 w-5 text-purple-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Livrées</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
-                      {orders?.filter((o: any) => o.status === "delivered").length || 0}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Filters */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              <div className="flex gap-4">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filtrer par statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Toutes les commandes</SelectItem>
-                    <SelectItem value="pending">En attente</SelectItem>
-                    <SelectItem value="preparing">En préparation</SelectItem>
-                    <SelectItem value="ready">Prêtes</SelectItem>
-                    <SelectItem value="delivered">Livrées</SelectItem>
-                    <SelectItem value="cancelled">Annulées</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Orders List - Responsive */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Commandes ({filteredOrders.length})</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {filteredOrders.map((order: any) => (
-                  <div
-                    key={order.id}
-                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 dark:bg-gray-800 rounded-xl"
-                  >
-                    {/* Info principale - Mobile d'abord */}
-                    <div className="flex items-start space-x-3 mb-4 sm:mb-0 sm:flex-1">
-                      <div className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-sm flex-shrink-0">
-                        {getStatusIcon(order.status)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
-                          #CMD-{order.id.toString().padStart(3, "0")}
-                        </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                          {order.customer.firstName} {order.customer.lastName}
-                        </p>
-                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                          {formatDateTime(order.createdAt)}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge className={getOrderStatusClassName(order.status)} variant="secondary">
-                            {getOrderStatusLabel(order.status)}
-                          </Badge>
-                          <span className="text-xs text-gray-500">
-                            {order.type === "delivery" ? "Livraison" : "Retrait"}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Prix et actions */}
-                    <div className="flex items-center justify-between sm:justify-end space-x-3">
-                      <div className="text-left sm:text-right">
-                        <p className="font-bold text-lg text-gray-900 dark:text-white">
-                          {formatCurrency(order.totalAmount)}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="icon" className="rounded-xl">
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>
-                                Détails de la commande #CMD-{order.id.toString().padStart(3, "0")}
-                              </DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                  <h4 className="font-medium mb-2">Client</h4>
-                                  <p>{order.customer.firstName} {order.customer.lastName}</p>
-                                  <p className="text-sm text-gray-600">{order.customer.email}</p>
-                                  <p className="text-sm text-gray-600">{order.customer.phone}</p>
-                                </div>
-                                <div>
-                                  <h4 className="font-medium mb-2">Livraison</h4>
-                                  <p>{order.type === "delivery" ? "Livraison à domicile" : "Retrait en magasin"}</p>
-                                  {order.deliveryAddress && (
-                                    <p className="text-sm text-gray-600">{order.deliveryAddress}</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {order.notes && (
-                                <div>
-                                  <h4 className="font-medium mb-2">Notes</h4>
-                                  <p className="text-sm text-gray-600">{order.notes}</p>
-                                </div>
-                              )}
-
-                              <div className="flex justify-between items-center pt-4 border-t">
-                                <span className="font-medium">Total</span>
-                                <span className="font-bold text-lg">{formatCurrency(order.totalAmount)}</span>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-
-                        {getNextStatus(order.status) && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
-                            disabled={updateOrderMutation.isPending}
-                            className="rounded-xl hidden sm:block"
-                          >
-                            {getNextStatusLabel(order.status)}
-                          </Button>
-                        )}
-
-                        {order.status !== "delivered" && order.status !== "cancelled" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleStatusUpdate(order.id, "cancelled")}
-                            disabled={updateOrderMutation.isPending}
-                            className="rounded-xl hidden sm:block"
-                          >
-                            Annuler
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions mobiles */}
-                    <div className="flex gap-2 mt-3 sm:hidden">
-                      {getNextStatus(order.status) && (
-                        <Button
-                          size="sm"
-                          onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
-                          disabled={updateOrderMutation.isPending}
-                          className="flex-1 rounded-xl"
-                        >
-                          {getNextStatusLabel(order.status)}
-                        </Button>
-                      )}
-
-                      {order.status !== "delivered" && order.status !== "cancelled" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleStatusUpdate(order.id, "cancelled")}
-                          disabled={updateOrderMutation.isPending}
-                          className="flex-1 rounded-xl"
-                        >
-                          Annuler
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {filteredOrders.length === 0 && (
-                <div className="text-center py-12">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">
-                    Aucune commande trouvée
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Clock className="h-5 w-5 text-orange-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">En attente</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {orders?.filter((o: any) => o.status === "pending").length || 0}
                   </p>
                 </div>
-              )}
+              </div>
             </CardContent>
           </Card>
-        </main>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Package className="h-5 w-5 text-blue-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">En préparation</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {orders?.filter((o: any) => o.status === "preparing").length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Prêtes</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {orders?.filter((o: any) => o.status === "ready").length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-2">
+                <Truck className="h-5 w-5 text-purple-600" />
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Livrées</p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {orders?.filter((o: any) => o.status === "delivered").length || 0}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <Card className="rounded-2xl border-0 shadow-lg">
+          <CardContent className="p-6">
+            <div className="flex gap-4">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full sm:w-48 rounded-xl">
+                  <SelectValue placeholder="Filtrer par statut" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes les commandes</SelectItem>
+                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="preparing">En préparation</SelectItem>
+                  <SelectItem value="ready">Prêtes</SelectItem>
+                  <SelectItem value="delivered">Livrées</SelectItem>
+                  <SelectItem value="cancelled">Annulées</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Orders List - iOS Design */}
+        <div className="space-y-4">
+          {filteredOrders.length === 0 ? (
+            <Card className="rounded-2xl border-0 shadow-lg">
+              <CardContent className="p-8 text-center">
+                <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">Aucune commande trouvée</p>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredOrders.map((order: any) => (
+              <Card key={order.id} className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800/50">
+                <CardContent className="p-5">
+                  {/* Header avec numéro et statut */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl shadow-md">
+                        {getStatusIcon(order.status)}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                          #CMD-{order.id.toString().padStart(3, "0")}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {formatDateTime(order.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className={`${getOrderStatusClassName(order.status)} rounded-xl px-3 py-1 font-medium`} variant="secondary">
+                      {getOrderStatusLabel(order.status)}
+                    </Badge>
+                  </div>
+
+                  {/* Informations client */}
+                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                          <User className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {order.customer.firstName} {order.customer.lastName}
+                          </p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {order.type === "delivery" ? "🚚 Livraison" : "🏪 Retrait"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-xl text-gray-900 dark:text-white">
+                          {formatCurrency(order.totalAmount)}
+                        </p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Total
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50">
+                          <Eye className="h-4 w-4 mr-2" />
+                          Voir détails
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Détails de la commande #CMD-{order.id.toString().padStart(3, "0")}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <h4 className="font-medium mb-2">Client</h4>
+                              <p>{order.customer.firstName} {order.customer.lastName}</p>
+                              <p className="text-sm text-gray-600">{order.customer.email}</p>
+                              <p className="text-sm text-gray-600">{order.customer.phone}</p>
+                            </div>
+                            <div>
+                              <h4 className="font-medium mb-2">Livraison</h4>
+                              <p>{order.type === "delivery" ? "Livraison à domicile" : "Retrait en magasin"}</p>
+                              {order.deliveryAddress && (
+                                <p className="text-sm text-gray-600">{order.deliveryAddress}</p>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {order.notes && (
+                            <div>
+                              <h4 className="font-medium mb-2">Notes</h4>
+                              <p className="text-sm text-gray-600">{order.notes}</p>
+                            </div>
+                          )}
+
+                          <div className="flex justify-between items-center pt-4 border-t">
+                            <span className="font-medium">Total</span>
+                            <span className="font-bold text-lg">{formatCurrency(order.totalAmount)}</span>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+
+                    {getNextStatus(order.status) && (
+                      <Button
+                        onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
+                        disabled={updateOrderMutation.isPending}
+                        className="flex-1 rounded-xl"
+                      >
+                        {getNextStatusLabel(order.status)}
+                      </Button>
+                    )}
+
+                    {order.status !== "delivered" && order.status !== "cancelled" && (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleStatusUpdate(order.id, "cancelled")}
+                        disabled={updateOrderMutation.isPending}
+                        className="flex-1 sm:flex-none rounded-xl"
+                      >
+                        Annuler
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      </main>
     </ManagerLayout>
   );
 }
