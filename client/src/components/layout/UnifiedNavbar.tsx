@@ -222,7 +222,7 @@ export default function UnifiedNavbar() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profile" className="w-full">
+                  <Link href={user.role === "manager" && location.startsWith("/manager") ? "/manager/profile" : "/profile"} className="w-full">
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
                   </Link>
@@ -324,7 +324,7 @@ export default function UnifiedNavbar() {
 
                   {/* User Actions */}
                   <div className="border-t pt-4 space-y-1">
-                    <Link href="/profile">
+                    <Link href={user.role === "manager" && location.startsWith("/manager") ? "/manager/profile" : "/profile"}>
                       <Button
                         variant="ghost"
                         className="w-full justify-start"
