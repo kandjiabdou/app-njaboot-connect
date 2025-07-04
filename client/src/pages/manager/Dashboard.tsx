@@ -256,19 +256,19 @@ export default function ManagerDashboard() {
                 Nouvelle Vente
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-7xl h-[90vh] p-0 overflow-hidden">
-              <DialogHeader className="p-4 md:p-6 pb-3 md:pb-4 border-b">
+            <DialogContent className="max-w-7xl max-h-[95vh] p-0 overflow-hidden flex flex-col">
+              <DialogHeader className="flex-shrink-0 p-4 md:p-6 pb-3 md:pb-4 border-b">
                 <DialogTitle className="text-xl font-bold">Point de Vente</DialogTitle>
                 <DialogDescription>
                   Sélectionnez les produits et finalisez la vente
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="flex flex-col lg:flex-row h-full overflow-hidden">
+              <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
                 {/* Section Produits - Gauche */}
-                <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex-1 flex flex-col min-h-0 max-h-full overflow-hidden">
                   {/* Barre de recherche */}
-                  <div className="p-4 md:p-6 pb-3 md:pb-4 border-b lg:border-b-0">
+                  <div className="flex-shrink-0 p-4 md:p-6 pb-3 md:pb-4 border-b lg:border-b-0">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
@@ -281,8 +281,8 @@ export default function ManagerDashboard() {
                   </div>
 
                   {/* Grille des produits avec scroll */}
-                  <div className="flex-1 overflow-y-auto">
-                    <div className="p-4 md:p-6 pt-4">
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <div className="p-4 md:p-6 pt-4 pb-8">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                         {filteredProducts.map((product) => (
                           <Card 
@@ -310,9 +310,9 @@ export default function ManagerDashboard() {
                 </div>
 
                 {/* Section Panier - Droite */}
-                <div className="w-full lg:w-96 flex flex-col bg-gray-50 dark:bg-gray-900 border-t lg:border-t-0 lg:border-l min-h-0">
+                <div className="w-full lg:w-96 flex flex-col bg-gray-50 dark:bg-gray-900 border-t lg:border-t-0 lg:border-l min-h-0 max-h-full overflow-hidden">
                   {/* En-tête du panier */}
-                  <div className="p-4 md:p-6 border-b">
+                  <div className="flex-shrink-0 p-4 md:p-6 border-b">
                     <h3 className="font-semibold text-lg mb-4">Panier</h3>
                     
                     {/* Sélection client */}
@@ -344,8 +344,8 @@ export default function ManagerDashboard() {
                   </div>
 
                   {/* Articles du panier avec scroll */}
-                  <div className="flex-1 overflow-y-auto min-h-0">
-                    <div className="p-4 md:p-6">
+                  <div className="flex-1 min-h-0 overflow-y-auto">
+                    <div className="p-4 md:p-6 pb-4">
                       {cartItems.length === 0 ? (
                         <div className="text-center text-gray-500 py-12">
                           <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-50" />
@@ -353,7 +353,7 @@ export default function ManagerDashboard() {
                           <p className="text-sm">Cliquez sur un produit pour l'ajouter</p>
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-4 pb-4">
                           {cartItems.map((item) => (
                             <div key={item.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
                               <div className="text-2xl flex-shrink-0 mt-1">{item.imageUrl}</div>
@@ -403,7 +403,7 @@ export default function ManagerDashboard() {
 
                   {/* Total et paiement */}
                   {cartItems.length > 0 && (
-                    <div className="border-t bg-white dark:bg-gray-800">
+                    <div className="flex-shrink-0 border-t bg-white dark:bg-gray-800 max-h-[60vh] overflow-y-auto">
                       {/* Total */}
                       <div className="p-4 md:p-6 border-b">
                         <div className="text-center bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
@@ -417,7 +417,7 @@ export default function ManagerDashboard() {
                       </div>
 
                       {/* Méthode de paiement */}
-                      <div className="p-4 md:p-6">
+                      <div className="p-4 md:p-6 pb-6">
                         <Form {...form}>
                           <form onSubmit={form.handleSubmit((data) => newSaleMutation.mutate(data))} className="space-y-6">
                             <FormField
@@ -476,7 +476,7 @@ export default function ManagerDashboard() {
                                   <FormControl>
                                     <Textarea 
                                       placeholder="Commentaires sur la vente..."
-                                      className="min-h-[100px] text-base"
+                                      className="min-h-[100px] text-base resize-none"
                                       {...field} 
                                     />
                                   </FormControl>
