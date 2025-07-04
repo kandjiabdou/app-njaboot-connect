@@ -257,7 +257,7 @@ export default function ManagerDashboard() {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-7xl h-[90vh] p-0 overflow-hidden">
-              <DialogHeader className="p-6 pb-4">
+              <DialogHeader className="p-4 md:p-6 pb-3 md:pb-4 border-b">
                 <DialogTitle className="text-xl font-bold">Point de Vente</DialogTitle>
                 <DialogDescription>
                   Sélectionnez les produits et finalisez la vente
@@ -266,9 +266,9 @@ export default function ManagerDashboard() {
               
               <div className="flex flex-col lg:flex-row h-full overflow-hidden">
                 {/* Section Produits - Gauche */}
-                <div className="flex-1 flex flex-col p-6 pt-0 min-h-0">
+                <div className="flex-1 flex flex-col min-h-0">
                   {/* Barre de recherche */}
-                  <div className="mb-4">
+                  <div className="p-4 md:p-6 pb-3 md:pb-4 border-b lg:border-b-0">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
@@ -280,42 +280,44 @@ export default function ManagerDashboard() {
                     </div>
                   </div>
 
-                  {/* Grille des produits */}
-                  <ScrollArea className="flex-1">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-4">
-                      {filteredProducts.map((product) => (
-                        <Card 
-                          key={product.id} 
-                          className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary/50"
-                          onClick={() => addToCart(product)}
-                        >
-                          <CardContent className="p-3 text-center">
-                            <div className="text-2xl md:text-3xl mb-2">{product.imageUrl}</div>
-                            <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-white mb-1 line-clamp-2 min-h-[2.5rem]">
-                              {product.name}
-                            </div>
-                            <div className="text-xs text-gray-500 mb-1">
-                              {formatCurrency(product.price)}/{product.unit}
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              {product.category}
-                            </Badge>
-                          </CardContent>
-                        </Card>
-                      ))}
+                  {/* Grille des produits avec scroll */}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="p-4 md:p-6 pt-4">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                        {filteredProducts.map((product) => (
+                          <Card 
+                            key={product.id} 
+                            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary/50"
+                            onClick={() => addToCart(product)}
+                          >
+                            <CardContent className="p-4 text-center">
+                              <div className="text-3xl md:text-4xl mb-3">{product.imageUrl}</div>
+                              <div className="text-sm md:text-base font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[2.5rem]">
+                                {product.name}
+                              </div>
+                              <div className="text-xs md:text-sm text-gray-500 mb-2">
+                                {formatCurrency(product.price)}/{product.unit}
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                {product.category}
+                              </Badge>
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
-                  </ScrollArea>
+                  </div>
                 </div>
 
                 {/* Section Panier - Droite */}
-                <div className="w-full lg:w-96 flex flex-col bg-gray-50 dark:bg-gray-900 border-l p-6 min-h-0">
+                <div className="w-full lg:w-96 flex flex-col bg-gray-50 dark:bg-gray-900 border-t lg:border-t-0 lg:border-l min-h-0">
                   {/* En-tête du panier */}
-                  <div className="mb-4">
+                  <div className="p-4 md:p-6 border-b">
                     <h3 className="font-semibold text-lg mb-4">Panier</h3>
                     
                     {/* Sélection client */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium mb-2">Client</label>
+                    <div>
+                      <label className="block text-sm font-medium mb-3">Client</label>
                       <Select onValueChange={(value) => setSelectedCustomer(value)}>
                         <SelectTrigger className="w-full h-12">
                           <SelectValue placeholder="Sélectionner un client..." />
@@ -341,156 +343,173 @@ export default function ManagerDashboard() {
                     </div>
                   </div>
 
-                  {/* Articles du panier */}
-                  <div className="flex-1 mb-4 min-h-0">
-                    <ScrollArea className="h-48 lg:h-64">
+                  {/* Articles du panier avec scroll */}
+                  <div className="flex-1 overflow-y-auto min-h-0">
+                    <div className="p-4 md:p-6">
                       {cartItems.length === 0 ? (
-                        <div className="text-center text-gray-500 py-8">
-                          <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                          <p className="font-medium">Panier vide</p>
-                          <p className="text-xs">Cliquez sur un produit pour l'ajouter</p>
+                        <div className="text-center text-gray-500 py-12">
+                          <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                          <p className="font-medium mb-2">Panier vide</p>
+                          <p className="text-sm">Cliquez sur un produit pour l'ajouter</p>
                         </div>
                       ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-4">
                           {cartItems.map((item) => (
-                            <div key={item.id} className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                              <div className="text-lg">{item.imageUrl}</div>
+                            <div key={item.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
+                              <div className="text-2xl flex-shrink-0 mt-1">{item.imageUrl}</div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium truncate">{item.name}</div>
-                                <div className="text-xs text-gray-500">
+                                <div className="text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                                  {item.name}
+                                </div>
+                                <div className="text-xs text-gray-500 mb-3">
                                   {formatCurrency(item.price)}/{item.unit}
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-8 w-8 p-0"
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                >
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="h-8 w-8 p-0"
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                >
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                                  onClick={() => removeFromCart(item.id)}
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-9 w-9 p-0"
+                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    >
+                                      <Minus className="h-4 w-4" />
+                                    </Button>
+                                    <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-9 w-9 p-0"
+                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    >
+                                      <Plus className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-9 w-9 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                    onClick={() => removeFromCart(item.id)}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           ))}
                         </div>
                       )}
-                    </ScrollArea>
+                    </div>
                   </div>
 
                   {/* Total et paiement */}
                   {cartItems.length > 0 && (
-                    <div className="space-y-4 border-t pt-4">
+                    <div className="border-t bg-white dark:bg-gray-800">
                       {/* Total */}
-                      <div className="text-center bg-white dark:bg-gray-800 p-4 rounded-lg">
-                        <div className="text-2xl font-bold text-green-600">
-                          {formatCurrency(getTotal())}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {cartItems.reduce((sum, item) => sum + item.quantity, 0)} article(s)
+                      <div className="p-4 md:p-6 border-b">
+                        <div className="text-center bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                          <div className="text-3xl font-bold text-green-600 mb-2">
+                            {formatCurrency(getTotal())}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {cartItems.reduce((sum, item) => sum + item.quantity, 0)} article(s)
+                          </div>
                         </div>
                       </div>
 
                       {/* Méthode de paiement */}
-                      <Form {...form}>
-                        <form onSubmit={form.handleSubmit((data) => newSaleMutation.mutate(data))} className="space-y-4">
-                          <FormField
-                            control={form.control}
-                            name="paymentMethod"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Méthode de Paiement</FormLabel>
-                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <div className="p-4 md:p-6">
+                        <Form {...form}>
+                          <form onSubmit={form.handleSubmit((data) => newSaleMutation.mutate(data))} className="space-y-6">
+                            <FormField
+                              control={form.control}
+                              name="paymentMethod"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-base font-medium">Méthode de Paiement</FormLabel>
+                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl>
+                                      <SelectTrigger className="h-14 text-base">
+                                        <SelectValue placeholder="Sélectionnez une méthode" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="cash">
+                                        <div className="flex items-center gap-3 py-2">
+                                          <Banknote className="h-5 w-5 text-green-600" />
+                                          <div>
+                                            <div className="font-medium">Espèces</div>
+                                            <div className="text-xs text-gray-500">Paiement en cash</div>
+                                          </div>
+                                        </div>
+                                      </SelectItem>
+                                      <SelectItem value="card">
+                                        <div className="flex items-center gap-3 py-2">
+                                          <CreditCard className="h-5 w-5 text-blue-600" />
+                                          <div>
+                                            <div className="font-medium">Carte Bancaire</div>
+                                            <div className="text-xs text-gray-500">Visa, Mastercard</div>
+                                          </div>
+                                        </div>
+                                      </SelectItem>
+                                      <SelectItem value="mobile">
+                                        <div className="flex items-center gap-3 py-2">
+                                          <Smartphone className="h-5 w-5 text-orange-600" />
+                                          <div>
+                                            <div className="font-medium">Mobile Money</div>
+                                            <div className="text-xs text-gray-500">Orange Money, Wave</div>
+                                          </div>
+                                        </div>
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name="notes"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-base font-medium">Notes (optionnel)</FormLabel>
                                   <FormControl>
-                                    <SelectTrigger className="h-12">
-                                      <SelectValue placeholder="Sélectionnez" />
-                                    </SelectTrigger>
+                                    <Textarea 
+                                      placeholder="Commentaires sur la vente..."
+                                      className="min-h-[100px] text-base"
+                                      {...field} 
+                                    />
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="cash">
-                                      <div className="flex items-center gap-2">
-                                        <Banknote className="h-4 w-4" />
-                                        <span>Espèces</span>
-                                      </div>
-                                    </SelectItem>
-                                    <SelectItem value="card">
-                                      <div className="flex items-center gap-2">
-                                        <CreditCard className="h-4 w-4" />
-                                        <span>Carte Bancaire</span>
-                                      </div>
-                                    </SelectItem>
-                                    <SelectItem value="mobile">
-                                      <div className="flex items-center gap-2">
-                                        <Smartphone className="h-4 w-4" />
-                                        <span>Mobile Money</span>
-                                      </div>
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
 
-                          <FormField
-                            control={form.control}
-                            name="notes"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Notes (optionnel)</FormLabel>
-                                <FormControl>
-                                  <Textarea 
-                                    placeholder="Commentaires sur la vente..."
-                                    className="min-h-[80px]"
-                                    {...field} 
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <div className="flex gap-3">
-                            <Button 
-                              type="button" 
-                              variant="outline" 
-                              onClick={() => {
-                                setNewSaleOpen(false);
-                                setCartItems([]);
-                                setSearchTerm("");
-                                setSelectedCustomer(null);
-                              }}
-                              className="flex-1 h-12"
-                            >
-                              Annuler
-                            </Button>
-                            <Button 
-                              type="submit" 
-                              disabled={newSaleMutation.isPending}
-                              className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-white font-medium"
-                            >
-                              {newSaleMutation.isPending ? "Traitement..." : "Régler"}
-                            </Button>
-                          </div>
-                        </form>
-                      </Form>
+                            <div className="flex gap-4 pt-4">
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={() => {
+                                  setNewSaleOpen(false);
+                                  setCartItems([]);
+                                  setSearchTerm("");
+                                  setSelectedCustomer(null);
+                                }}
+                                className="flex-1 h-14 text-base"
+                              >
+                                Annuler
+                              </Button>
+                              <Button 
+                                type="submit" 
+                                disabled={newSaleMutation.isPending}
+                                className="flex-1 h-14 bg-green-600 hover:bg-green-700 text-white font-medium text-base"
+                              >
+                                {newSaleMutation.isPending ? "Traitement..." : "Finaliser la Vente"}
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
+                      </div>
                     </div>
                   )}
                 </div>
