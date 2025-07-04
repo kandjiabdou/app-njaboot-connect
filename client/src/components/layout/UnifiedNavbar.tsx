@@ -101,24 +101,25 @@ export default function UnifiedNavbar() {
 
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
+        <div className="flex justify-between items-center h-16 min-w-0">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0">
             <Link href={location.startsWith("/manager") ? "/manager/dashboard" : "/"}>
-              <div className="flex-shrink-0 flex items-center">
-                <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                  <Store className="h-5 w-5 text-white" />
+              <div className="flex items-center">
+                <div className="h-6 w-6 lg:h-8 lg:w-8 bg-primary rounded-lg flex items-center justify-center">
+                  <Store className="h-3 w-3 lg:h-5 lg:w-5 text-white" />
                 </div>
-                <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
-                  Njaboot Connect
+                <span className="ml-1 lg:ml-2 text-sm lg:text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                  <span className="hidden sm:inline">Njaboot Connect</span>
+                  <span className="sm:hidden">Njaboot</span>
                 </span>
               </div>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-1 lg:space-x-2 xl:space-x-4 flex-1 justify-center max-w-2xl mx-4">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
               return (
@@ -126,12 +127,13 @@ export default function UnifiedNavbar() {
                   <Button
                     variant={isActiveLink(link.href) ? "default" : "ghost"}
                     size="sm"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 text-xs lg:text-sm whitespace-nowrap"
                   >
-                    <Icon className="h-4 w-4" />
-                    {link.label}
+                    <Icon className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
+                    <span className="hidden lg:inline">{link.label}</span>
+                    <span className="lg:hidden">{link.label.split(' ')[0]}</span>
                     {link.href === "/cart" && totalItems > 0 && (
-                      <Badge variant="secondary" className="ml-1 text-xs">
+                      <Badge variant="secondary" className="ml-1 text-xs h-4 w-4 p-0 flex items-center justify-center">
                         {totalItems}
                       </Badge>
                     )}
@@ -142,22 +144,24 @@ export default function UnifiedNavbar() {
           </div>
 
           {/* Right side */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 lg:space-x-2 xl:space-x-4">
             {/* Role Switch Button - Only show for managers */}
             {user.role === "manager" && (
               <div className="hidden md:block">
                 {location.startsWith("/manager") ? (
                   <Link href="/">
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      Vue Client
+                    <Button variant="outline" size="sm" className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm">
+                      <ShoppingCart className="h-3 w-3 lg:h-4 lg:w-4" />
+                      <span className="hidden lg:inline">Vue Client</span>
+                      <span className="lg:hidden">Client</span>
                     </Button>
                   </Link>
                 ) : (
                   <Link href="/manager/dashboard">
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
-                      <BarChart3 className="h-4 w-4" />
-                      Vue Gérant
+                    <Button variant="outline" size="sm" className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm">
+                      <BarChart3 className="h-3 w-3 lg:h-4 lg:w-4" />
+                      <span className="hidden lg:inline">Vue Gérant</span>
+                      <span className="lg:hidden">Gérant</span>
                     </Button>
                   </Link>
                 )}
@@ -167,12 +171,12 @@ export default function UnifiedNavbar() {
             {/* Cart (desktop only) - Show for all users when not on manager routes */}
             {!location.startsWith("/manager") && (
               <Link href="/cart" className="hidden md:block">
-                <Button variant="ghost" size="sm" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
+                <Button variant="ghost" size="sm" className="relative p-2">
+                  <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
                   {totalItems > 0 && (
                     <Badge 
                       variant="destructive" 
-                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center text-xs"
+                      className="absolute -top-1 -right-1 h-4 w-4 lg:h-5 lg:w-5 flex items-center justify-center text-xs"
                     >
                       {totalItems}
                     </Badge>
@@ -182,8 +186,8 @@ export default function UnifiedNavbar() {
             )}
 
             {/* Notifications */}
-            <Button variant="ghost" size="sm">
-              <Bell className="h-5 w-5" />
+            <Button variant="ghost" size="sm" className="p-2">
+              <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
             </Button>
 
             {/* User menu */}
