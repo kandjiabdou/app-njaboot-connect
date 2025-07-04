@@ -128,9 +128,33 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="mt-4 space-y-2 text-xs text-gray-600 dark:text-gray-400">
-                <p><strong>Gérant:</strong> marie.dubois@njaboot.com / password123</p>
-                <p><strong>Client:</strong> amadou.diallo@email.com / password123</p>
+              <div className="mt-4 space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    setFormData({
+                      email: "marie.dubois@njaboot.com",
+                      password: "password123"
+                    });
+                  }}
+                >
+                  Test Gérant
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    setFormData({
+                      email: "amadou.diallo@email.com",
+                      password: "password123"
+                    });
+                  }}
+                >
+                  Test Client
+                </Button>
               </div>
             </div>
 
