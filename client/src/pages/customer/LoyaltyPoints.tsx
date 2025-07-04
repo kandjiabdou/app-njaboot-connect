@@ -137,8 +137,16 @@ export default function LoyaltyPoints() {
     },
   ];
 
-  const displayData = loyaltyData || mockLoyaltyData;
-  const loyaltyLevel = getLoyaltyLevel(displayData.currentPoints);
+  const displayData = {
+    currentPoints: loyaltyData?.points || mockLoyaltyData.currentPoints,
+    totalEarned: loyaltyData?.totalEarned || mockLoyaltyData.totalEarned,
+    totalRedeemed: loyaltyData?.totalRedeemed || mockLoyaltyData.totalRedeemed,
+    level: loyaltyData?.level || mockLoyaltyData.level,
+    nextLevelPoints: loyaltyData?.nextLevelPoints || mockLoyaltyData.nextLevelPoints,
+    monthlyEarned: loyaltyData?.monthlyEarned || mockLoyaltyData.monthlyEarned,
+    memberSince: loyaltyData?.createdAt || mockLoyaltyData.memberSince,
+  };
+  const loyaltyLevel = getLoyaltyLevel(displayData.currentPoints || 0);
 
   const handleRedeemReward = (reward: LoyaltyReward) => {
     if (displayData.currentPoints >= reward.pointsCost) {
