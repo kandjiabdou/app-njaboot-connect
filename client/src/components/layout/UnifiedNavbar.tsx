@@ -52,6 +52,9 @@ export default function UnifiedNavbar() {
 
   const getCurrentLinks = () => {
     if (!user) return [];
+    console.log('Current user:', user, 'Role:', user.role);
+    console.log('Is manager?', user.role === "manager");
+    console.log('Will show links:', user.role === "manager" ? 'manager' : 'customer');
     return user.role === "manager" ? managerLinks : customerLinks;
   };
 
