@@ -61,26 +61,26 @@ export default function UnifiedNavbar() {
     return false;
   };
 
-  // Guest navbar
+  // Guest navbar avec design iOS
   if (!user) {
     return (
-      <nav className="bg-white border-b">
+      <nav className="bg-white/95 backdrop-blur-lg border-b border-gray-200/20 shadow-lg">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/">
-              <div className="flex items-center">
-                <div className="h-8 w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
+              <div className="flex items-center transition-all duration-300 hover:scale-105">
+                <div className="h-8 w-8 bg-[#258C42] rounded-xl flex items-center justify-center shadow-md">
                   <Store className="h-5 w-5 text-white" />
                 </div>
                 <span className="ml-2 text-xl font-bold text-gray-900">Njaboot Connect</span>
               </div>
             </Link>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Link href="/login">
-                <Button variant="ghost" className="text-black hover:bg-black/10">Se connecter</Button>
+                <Button variant="ghost" className="rounded-xl text-black hover:bg-black/5 transition-all duration-300">Se connecter</Button>
               </Link>
               <Link href="/register">
-                <Button className="bg-[#258C42] text-white hover:bg-[#1F7A37]">S'inscrire</Button>
+                <Button className="rounded-xl bg-[#258C42] text-white hover:bg-[#1F7A37] shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-300 focus:ring-2 focus:ring-[#258C42]/30">S'inscrire</Button>
               </Link>
             </div>
           </div>
@@ -93,11 +93,11 @@ export default function UnifiedNavbar() {
     <nav className={navbar.navbar}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
         <div className="flex justify-between items-center h-16 gap-4">
-          {/* Logo */}
+          {/* Logo avec design iOS */}
           <div className="flex items-center flex-shrink-0">
             <Link href={location.startsWith("/manager") ? "/manager" : "/"}>
-              <div className="flex items-center">
-                <div className="h-6 w-6 lg:h-8 lg:w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
+              <div className="flex items-center transition-all duration-300 hover:scale-105">
+                <div className="h-6 w-6 lg:h-8 lg:w-8 bg-[#258C42] rounded-xl flex items-center justify-center shadow-md">
                   <Store className="h-3 w-3 lg:h-5 lg:w-5 text-white" />
                 </div>
                 <span className={`ml-1 lg:ml-2 text-sm lg:text-xl font-bold whitespace-nowrap ${navbar.logo}`}>
@@ -118,9 +118,9 @@ export default function UnifiedNavbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm whitespace-nowrap ${
+                    className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm whitespace-nowrap rounded-xl transition-all duration-300 ${
                       isActive 
-                        ? navbar.navTextActive 
+                        ? `${navbar.navTextActive} bg-white/10 shadow-sm` 
                         : `${navbar.navText} ${navbar.navHover}`
                     }`}
                   >

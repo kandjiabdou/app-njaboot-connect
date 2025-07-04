@@ -95,6 +95,9 @@ The application is designed to run in Replit's environment with specific configu
 - January 3, 2025. Fixed LoyaltyPoints page crash by improving data safety checks
 - January 3, 2025. Implemented interactive map for store locations using Leaflet library with realistic Dakar coordinates
 - January 3, 2025. Fixed mobile responsiveness issues: product detail tabs, cart layout, and store detail page with functional banner images
+- January 3, 2025. Implemented iOS-inspired design system with centralized design tokens in theme.ts
+- January 3, 2025. Enhanced navigation with backdrop blur, rounded corners, and smooth transitions
+- January 3, 2025. Updated ProductCard components with iOS styling: rounded corners, shadows, and animations
 
 ## User Preferences
 
