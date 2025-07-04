@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,15 +26,61 @@ import {
   Clock,
   CheckCircle,
   AlertCircle,
-  XCircle
+  XCircle,
+  Eye
 } from "lucide-react";
 
 export default function SupplyManagement() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedCenter, setSelectedCenter] = useState<number | null>(null);
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [orderItems, setOrderItems] = useState<Array<{productId: number, quantity: number, unitPrice: number}>>([]);
+
+  // Données des centrales d'achat sénégalaises
+  const senegalCenters = [
+    {
+      id: 1,
+      name: "SOGROS Dakar",
+      address: "Zone Industrielle de Dakar, Route de Rufisque",
+      city: "Dakar",
+      contactEmail: "commandes@sogros.sn",
+      contactPhone: "+221 33 849 25 00",
+      description: "Centrale d'achat alimentaire leader au Sénégal",
+      specialties: ["Produits alimentaires", "Boissons", "Épices", "Conserves"]
+    },
+    {
+      id: 2,
+      name: "CDEPS Thiès",
+      address: "Zone Commerciale de Thiès, Avenue Lamine Guèye",
+      city: "Thiès", 
+      contactEmail: "approvisionnement@cdeps.sn",
+      contactPhone: "+221 33 951 12 34",
+      description: "Centre de distribution pour l'ensemble du pays",
+      specialties: ["Céréales", "Légumineuses", "Huiles", "Sucre"]
+    },
+    {
+      id: 3,
+      name: "SENMARKET Saint-Louis",
+      address: "Quartier Sud, Route de Richard Toll",
+      city: "Saint-Louis",
+      contactEmail: "ventes@senmarket.sn", 
+      contactPhone: "+221 33 961 45 67",
+      description: "Spécialisé dans les produits du terroir sénégalais",
+      specialties: ["Riz local", "Mil", "Arachides", "Bissap"]
+    },
+    {
+      id: 4,
+      name: "AGROCENTER Kaolack",
+      address: "Marché Central, Avenue Valdiodio Ndiaye",
+      city: "Kaolack",
+      contactEmail: "commandes@agrocenter.sn",
+      contactPhone: "+221 33 941 78 90",
+      description: "Centrale agricole pour le bassin arachidier",
+      specialties: ["Produits frais", "Légumes", "Fruits", "Viandes"]
+    }
+  ];
 
   // Fetch store data
   const { data: store } = useQuery({
@@ -333,59 +379,97 @@ export default function SupplyManagement() {
                   ) : supplyOrders?.length > 0 ? (
                     <div className="space-y-4">
                       {supplyOrders.map((order: any) => (
-                        <div key={order.id} className="border rounded-xl p-4 space-y-3 bg-white dark:bg-gray-800/50 shadow-sm">
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-                                <span className="font-medium text-lg">#{order.orderNumber}</span>
-                                {getOrderStatusBadge(order.status)}
+                        <Card key={order.id} className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800/50">
+                          <CardContent className="p-5">
+                            {/* Header avec numéro et statut */}
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2.5 bg-gradient-to-br from-blue-400 to-blue-500 rounded-xl shadow-md">
+                                  <Package className="h-5 w-5 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                                    #{order.orderNumber}
+                                  </h3>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {formatDateTime(order.createdAt)}
+                                  </p>
+                                </div>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                                {order.center?.name}
-                              </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-500">
-                                {formatDateTime(order.createdAt)}
-                              </p>
+                              {getOrderStatusBadge(order.status)}
                             </div>
-                            <div className="text-left sm:text-right">
-                              <div className="font-bold text-lg text-gray-900 dark:text-white">{formatCurrency(order.totalAmount)}</div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {order.items?.length || 0} produit(s)
+
+                            {/* Informations centrale */}
+                            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                                    <Building2 className="h-4 w-4 text-green-600" />
+                                  </div>
+                                  <div>
+                                    <p className="font-medium text-gray-900 dark:text-white">
+                                      {order.center?.name || 'Centrale inconnue'}
+                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                      📦 {order.items?.length || 0} produit(s)
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-xl text-gray-900 dark:text-white">
+                                    {formatCurrency(order.totalAmount)}
+                                  </p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Total HT
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              className="rounded-xl flex-1 sm:flex-none"
-                              onClick={() => updateOrderMutation.mutate({ 
-                                orderId: order.id, 
-                                status: order.status === 'pending' ? 'confirmed' : order.status 
-                              })}
-                              disabled={order.status === 'delivered' || order.status === 'cancelled'}
-                            >
-                              {order.status === 'pending' && 'Confirmer'}
-                              {order.status === 'confirmed' && 'Marquer comme expédiée'}
-                              {order.status === 'shipped' && 'Marquer comme livrée'}
-                              {(order.status === 'delivered' || order.status === 'cancelled') && 'Terminée'}
-                            </Button>
-                            
-                            {order.invoiceUrl && (
+
+                            {/* Actions */}
+                            <div className="flex flex-col sm:flex-row gap-3">
                               <Button 
                                 variant="outline" 
-                                size="sm"
-                                className="rounded-xl flex-1 sm:flex-none"
-                                onClick={() => window.open(order.invoiceUrl, '_blank')}
+                                className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50"
+                                onClick={() => updateOrderMutation.mutate({ 
+                                  orderId: order.id, 
+                                  status: order.status === 'pending' ? 'confirmed' : order.status 
+                                })}
+                                disabled={order.status === 'delivered' || order.status === 'cancelled'}
                               >
-                                <Download className="h-3 w-3 mr-1" />
-                                <span className="hidden sm:inline">Facture</span>
-                                <span className="sm:hidden">PDF</span>
+                                <Eye className="h-4 w-4 mr-2" />
+                                Voir détails
                               </Button>
-                            )}
-                          </div>
-                        </div>
+                              
+                              {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                                <Button 
+                                  className="flex-1 rounded-xl"
+                                  onClick={() => updateOrderMutation.mutate({ 
+                                    orderId: order.id, 
+                                    status: order.status === 'pending' ? 'confirmed' : 
+                                           order.status === 'confirmed' ? 'shipped' : 'delivered'
+                                  })}
+                                >
+                                  {order.status === 'pending' && 'Confirmer'}
+                                  {order.status === 'confirmed' && 'Marquer expédiée'}
+                                  {order.status === 'shipped' && 'Marquer reçue'}
+                                </Button>
+                              )}
+                              
+                              {order.invoiceUrl && (
+                                <Button 
+                                  variant="outline" 
+                                  className="flex-1 sm:flex-none rounded-xl"
+                                  onClick={() => window.open(order.invoiceUrl, '_blank')}
+                                >
+                                  <Download className="h-4 w-4 mr-2" />
+                                  <span className="hidden sm:inline">Facture</span>
+                                  <span className="sm:hidden">PDF</span>
+                                </Button>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
                       ))}
                     </div>
                   ) : (
@@ -406,29 +490,82 @@ export default function SupplyManagement() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {purchasingCenters?.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {purchasingCenters.map((center: any) => (
-                        <Card key={center.id} className="p-4">
-                          <div className="flex items-start gap-3">
-                            <Building2 className="h-8 w-8 text-blue-600 flex-shrink-0" />
-                            <div className="flex-1">
-                              <h3 className="font-medium">{center.name}</h3>
-                              <p className="text-sm text-gray-600 mb-2">{center.address}</p>
-                              <div className="space-y-1 text-xs text-gray-500">
-                                <p>Email: {center.contactEmail}</p>
-                                <p>Tél: {center.contactPhone}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {senegalCenters.map((center) => (
+                      <Card key={center.id} className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800/50">
+                        <CardContent className="p-5">
+                          {/* Header avec icône et ville */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-start gap-3">
+                              <div className="p-3 bg-gradient-to-br from-green-400 to-green-500 rounded-xl shadow-md">
+                                <Building2 className="h-6 w-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                                  {center.name}
+                                </h3>
+                                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                                  📍 {center.city}
+                                </p>
                               </div>
                             </div>
                           </div>
-                        </Card>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      Aucune centrale d'achat disponible
-                    </div>
-                  )}
+
+                          {/* Description */}
+                          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                              {center.description}
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {center.specialties.map((specialty, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs rounded-lg">
+                                  {specialty}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Contact et adresse */}
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <span>📍</span>
+                              <span className="line-clamp-1">{center.address}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <span>📧</span>
+                              <span>{center.contactEmail}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                              <span>📞</span>
+                              <span>{center.contactPhone}</span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50"
+                              onClick={() => setSelectedCenter(center.id)}
+                            >
+                              <Package className="h-4 w-4 mr-2" />
+                              Voir produits
+                            </Button>
+                            <Button 
+                              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700"
+                              onClick={() => {
+                                setSelectedCenter(center.id);
+                                setIsNewOrderOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Commander
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -451,6 +588,223 @@ export default function SupplyManagement() {
           </Tabs>
         </div>
       </div>
+
+      {/* Dialog pour nouvelle commande */}
+      <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              Nouvelle commande d'approvisionnement
+            </DialogTitle>
+          </DialogHeader>
+
+          {!selectedCenter ? (
+            // Étape 1: Sélection de la centrale
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Choisissez une centrale d'achat</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {senegalCenters.map((center) => (
+                  <Card 
+                    key={center.id} 
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-green-500"
+                    onClick={() => setSelectedCenter(center.id)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2.5 bg-gradient-to-br from-green-400 to-green-500 rounded-xl">
+                          <Building2 className="h-5 w-5 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-lg text-gray-900">{center.name}</h4>
+                          <p className="text-sm text-green-600 font-medium">📍 {center.city}</p>
+                          <p className="text-sm text-gray-600 mt-2">{center.description}</p>
+                          
+                          <div className="flex flex-wrap gap-1 mt-3">
+                            {center.specialties.slice(0, 3).map((specialty, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs">
+                                {specialty}
+                              </Badge>
+                            ))}
+                            {center.specialties.length > 3 && (
+                              <Badge variant="secondary" className="text-xs">
+                                +{center.specialties.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ) : (
+            // Étape 2: Sélection des produits
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">Sélectionnez les produits</h3>
+                  <p className="text-sm text-gray-600">
+                    Centrale: {senegalCenters.find(c => c.id === selectedCenter)?.name}
+                  </p>
+                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSelectedCenter(null)}
+                  className="rounded-xl"
+                >
+                  ← Changer de centrale
+                </Button>
+              </div>
+
+              {centerProducts?.length > 0 ? (
+                <div className="space-y-3">
+                  {centerProducts.map((item: any) => {
+                    const currentItem = orderItems.find(oi => oi.productId === item.product.id);
+                    return (
+                      <Card key={item.id} className="rounded-xl">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-medium">{item.product.name}</h4>
+                              <p className="text-sm text-gray-600">{item.product.description}</p>
+                              <p className="text-sm font-semibold text-green-600">
+                                {formatCurrency(item.unitPrice)} / {item.product.unit}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Input
+                                type="number"
+                                placeholder="Quantité"
+                                min="0"
+                                className="w-24 rounded-lg"
+                                value={currentItem?.quantity || ''}
+                                onChange={(e) => {
+                                  const quantity = parseInt(e.target.value) || 0;
+                                  if (quantity > 0) {
+                                    setOrderItems(prev => {
+                                      const existing = prev.find(oi => oi.productId === item.product.id);
+                                      if (existing) {
+                                        return prev.map(oi => 
+                                          oi.productId === item.product.id 
+                                            ? { ...oi, quantity }
+                                            : oi
+                                        );
+                                      } else {
+                                        return [...prev, {
+                                          productId: item.product.id,
+                                          quantity,
+                                          unitPrice: parseFloat(item.unitPrice)
+                                        }];
+                                      }
+                                    });
+                                  } else {
+                                    setOrderItems(prev => prev.filter(oi => oi.productId !== item.product.id));
+                                  }
+                                }}
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg"
+                                onClick={() => {
+                                  const currentQuantity = currentItem?.quantity || 0;
+                                  const newQuantity = currentQuantity + 1;
+                                  setOrderItems(prev => {
+                                    const existing = prev.find(oi => oi.productId === item.product.id);
+                                    if (existing) {
+                                      return prev.map(oi => 
+                                        oi.productId === item.product.id 
+                                          ? { ...oi, quantity: newQuantity }
+                                          : oi
+                                      );
+                                    } else {
+                                      return [...prev, {
+                                        productId: item.product.id,
+                                        quantity: newQuantity,
+                                        unitPrice: parseFloat(item.unitPrice)
+                                      }];
+                                    }
+                                  });
+                                }}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  Aucun produit disponible pour cette centrale
+                </div>
+              )}
+
+              {orderItems.length > 0 && (
+                <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                  <h4 className="font-semibold">Résumé de la commande</h4>
+                  <div className="space-y-2">
+                    {orderItems.map((item) => {
+                      const product = centerProducts?.find((cp: any) => cp.product.id === item.productId);
+                      return (
+                        <div key={item.productId} className="flex justify-between text-sm">
+                          <span>{product?.product.name} x {item.quantity}</span>
+                          <span className="font-medium">
+                            {formatCurrency(item.quantity * item.unitPrice)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold">
+                    <span>Total</span>
+                    <span>
+                      {formatCurrency(
+                        orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0)
+                      )}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 rounded-xl"
+                  onClick={() => {
+                    setIsNewOrderOpen(false);
+                    setSelectedCenter(null);
+                    setOrderItems([]);
+                  }}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  className="flex-1 rounded-xl"
+                  disabled={orderItems.length === 0 || createOrderMutation.isPending}
+                  onClick={() => {
+                    if (selectedCenter && store?.id && orderItems.length > 0) {
+                      const totalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
+                      createOrderMutation.mutate({
+                        storeId: store.id,
+                        centerId: selectedCenter,
+                        totalAmount,
+                        items: orderItems
+                      });
+                    }
+                  }}
+                >
+                  {createOrderMutation.isPending ? "Création..." : "Créer la commande"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </ManagerLayout>
   );
 }
