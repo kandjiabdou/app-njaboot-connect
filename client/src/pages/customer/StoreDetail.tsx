@@ -43,7 +43,7 @@ export default function StoreDetail() {
   // Generate store image based on store ID and name
   const getStoreImage = (storeId: string, storeName: string) => {
     const storeImages: { [key: string]: string } = {
-      "1": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop&crop=center&q=80", // Grocery store
+      "1": "/public/boutik-interieur.jpg", // Grocery store
       "2": "https://images.unsplash.com/photo-1604719312566-878528dcab91?w=800&h=400&fit=crop&crop=center&q=80", // Market
       "3": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop&crop=center&q=80", // Local store
     };
