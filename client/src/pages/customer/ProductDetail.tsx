@@ -385,13 +385,13 @@ export default function ProductDetail() {
       </div>
 
       {/* Onglets détaillés */}
-      <Tabs defaultValue="description" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
-          <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
-          <TabsTrigger value="nutrition" className="text-xs sm:text-sm">Nutrition</TabsTrigger>
-          <TabsTrigger value="logistics" className="text-xs sm:text-sm">Logistique</TabsTrigger>
-          <TabsTrigger value="stores" className="text-xs sm:text-sm">Boutiques</TabsTrigger>
-          <TabsTrigger value="reviews" className="text-xs sm:text-sm">Avis</TabsTrigger>
+      <Tabs defaultValue="description" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 h-auto p-1 bg-muted rounded-lg">
+          <TabsTrigger value="description" className="text-xs sm:text-sm py-2.5 px-3">Description</TabsTrigger>
+          <TabsTrigger value="nutrition" className="text-xs sm:text-sm py-2.5 px-3">Nutrition</TabsTrigger>
+          <TabsTrigger value="logistics" className="text-xs sm:text-sm py-2.5 px-3">Logistique</TabsTrigger>
+          <TabsTrigger value="stores" className="text-xs sm:text-sm py-2.5 px-3">Boutiques</TabsTrigger>
+          <TabsTrigger value="reviews" className="text-xs sm:text-sm py-2.5 px-3">Avis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4">

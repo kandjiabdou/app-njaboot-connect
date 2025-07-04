@@ -194,13 +194,13 @@ export default function StoreDetail() {
       </div>
 
       {/* Onglets détaillés */}
-      <Tabs defaultValue="products" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
-          <TabsTrigger value="products" className="text-xs sm:text-sm">Produits</TabsTrigger>
-          <TabsTrigger value="info" className="text-xs sm:text-sm">Infos</TabsTrigger>
-          <TabsTrigger value="hours" className="text-xs sm:text-sm">Horaires</TabsTrigger>
-          <TabsTrigger value="services" className="text-xs sm:text-sm">Services</TabsTrigger>
-          <TabsTrigger value="promotions" className="text-xs sm:text-sm">Promos</TabsTrigger>
+      <Tabs defaultValue="products" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 h-auto p-1 bg-muted rounded-lg">
+          <TabsTrigger value="products" className="text-xs sm:text-sm py-2.5 px-3">Produits</TabsTrigger>
+          <TabsTrigger value="info" className="text-xs sm:text-sm py-2.5 px-3">Infos</TabsTrigger>
+          <TabsTrigger value="hours" className="text-xs sm:text-sm py-2.5 px-3">Horaires</TabsTrigger>
+          <TabsTrigger value="services" className="text-xs sm:text-sm py-2.5 px-3">Services</TabsTrigger>
+          <TabsTrigger value="promotions" className="text-xs sm:text-sm py-2.5 px-3">Promos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-4">
