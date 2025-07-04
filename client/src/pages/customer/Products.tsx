@@ -202,7 +202,7 @@ export default function CustomerProducts() {
         ) : (
           <>
             {viewMode === "grid" ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
                 {filteredProducts.map((product: any) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -214,9 +214,26 @@ export default function CustomerProducts() {
                     <CardContent className="p-6">
                       <div className="flex items-center space-x-4">
                         <img
-                          src={`${product.imageUrl}&auto=format&fit=crop&w=120&h=120`}
+                          src={(() => {
+                            const name = product.name.toLowerCase();
+                            if (name.includes('riz')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=120&h=120&fit=crop';
+                            if (name.includes('huile')) return 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=120&h=120&fit=crop';
+                            if (name.includes('sucre')) return 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=120&h=120&fit=crop';
+                            if (name.includes('farine')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=120&h=120&fit=crop';
+                            if (name.includes('lait')) return 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=120&h=120&fit=crop';
+                            if (name.includes('pain')) return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=120&h=120&fit=crop';
+                            if (name.includes('tomate')) return 'https://images.unsplash.com/photo-1546470427-e1357b94edff?w=120&h=120&fit=crop';
+                            if (name.includes('pomme')) return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=120&h=120&fit=crop';
+                            if (name.includes('banane')) return 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=120&h=120&fit=crop';
+                            if (name.includes('poisson')) return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=120&h=120&fit=crop';
+                            if (name.includes('viande')) return 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=120&h=120&fit=crop';
+                            return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=120&h=120&fit=crop';
+                          })()}
                           alt={product.name}
                           className="w-24 h-24 object-cover rounded-lg"
+                          onError={(e) => {
+                            e.currentTarget.src = '/api/placeholder/120/120';
+                          }}
                         />
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
