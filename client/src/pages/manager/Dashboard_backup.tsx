@@ -40,7 +40,7 @@ import {
 
 // Layout
 import ManagerLayout from "@/components/layout/ManagerLayout";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import LoadingSpinner from "@/components/ui/loading-spinner";
 
 const newSaleSchema = z.object({
   paymentMethod: z.string().min(1, "Méthode de paiement requise"),
