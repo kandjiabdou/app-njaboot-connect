@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import ManagerLayout from "@/components/layout/ManagerLayout";
 import { 
   Package, 
   Truck, 
@@ -48,54 +49,58 @@ export default function SupplyManagement() {
   });
 
   // Fetch purchasing centers
-  const { data: purchasingCenters, isLoading: centersLoading } = useQuery({
+  const { data: purchasingCenters } = useQuery({
     queryKey: ["/api/purchasing-centers"],
   });
 
-  // Fetch center products when center is selected
+  // Fetch center products when a center is selected
   const { data: centerProducts } = useQuery({
     queryKey: [`/api/center-products/${selectedCenter}`],
     enabled: !!selectedCenter,
   });
 
-  // Create supply order mutation
+  // Create order mutation
   const createOrderMutation = useMutation({
-    mutationFn: async (orderData: any) => {
-      return apiRequest("/api/supply-orders", {
-        method: "POST",
-        body: JSON.stringify(orderData),
-      });
-    },
+    mutationFn: (orderData: any) => apiRequest(`/api/supply-orders`, {
+      method: "POST",
+      body: JSON.stringify(orderData),
+    }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/supply-orders/${store?.id}`] });
+      toast({
+        title: "Succès",
+        description: "Commande créée avec succès",
+      });
       setIsNewOrderOpen(false);
       setOrderItems([]);
       setSelectedCenter(null);
+      queryClient.invalidateQueries({ queryKey: [`/api/supply-orders/${store?.id}`] });
+    },
+    onError: () => {
       toast({
-        title: "Commande créée",
-        description: "Votre commande d'approvisionnement a été créée avec succès",
+        title: "Erreur",
+        description: "Impossible de créer la commande",
+        variant: "destructive",
       });
     },
   });
 
   // Update order status mutation
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: number; status: string }) => {
-      return apiRequest(`/api/supply-orders/${orderId}/status`, {
+  const updateOrderMutation = useMutation({
+    mutationFn: ({ orderId, status }: { orderId: number; status: string }) => 
+      apiRequest(`/api/supply-orders/${orderId}/status`, {
         method: "PATCH",
         body: JSON.stringify({ status }),
-      });
-    },
+      }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/supply-orders/${store?.id}`] });
       toast({
-        title: "Statut mis à jour",
-        description: "Le statut de la commande a été mis à jour",
+        title: "Succès",
+        description: "Statut de la commande mis à jour",
       });
+      queryClient.invalidateQueries({ queryKey: [`/api/supply-orders/${store?.id}`] });
     },
   });
 
-  const getStatusBadge = (status: string) => {
+  const getOrderStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { label: "En attente", variant: "secondary" as const, icon: Clock },
       confirmed: { label: "Confirmée", variant: "default" as const, icon: CheckCircle },
@@ -128,7 +133,7 @@ export default function SupplyManagement() {
     const totalAmount = orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
 
     createOrderMutation.mutate({
-      storeId: store.id,
+      storeId: store?.id,
       centerId: selectedCenter,
       totalAmount,
       items: orderItems,
@@ -153,332 +158,293 @@ export default function SupplyManagement() {
     }
   };
 
-  const downloadInvoice = (invoiceUrl: string, orderNumber: string) => {
-    // Simulate invoice download
-    toast({
-      title: "Téléchargement",
-      description: `Facture ${orderNumber} téléchargée`,
-    });
-  };
-
   if (!user || user.role !== "manager") {
     return <div>Accès non autorisé</div>;
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Approvisionnement</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Gestion des commandes et des centrales d'achat
-          </p>
-        </div>
-        <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Nouvelle Commande
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>Créer une nouvelle commande</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6">
-              {/* Selection de la centrale */}
-              <div>
-                <Label>Centrale d'achat</Label>
-                <Select onValueChange={(value) => setSelectedCenter(Number(value))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner une centrale" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {purchasingCenters?.map((center: any) => (
-                      <SelectItem key={center.id} value={center.id.toString()}>
-                        <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">{center.name}</div>
-                            <div className="text-sm text-gray-500">{center.city}</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Produits disponibles */}
-              {selectedCenter && centerProducts && (
-                <div>
-                  <Label>Produits disponibles</Label>
-                  <div className="grid gap-4 mt-2">
-                    {centerProducts.map((item: any) => (
-                      <Card key={item.id}>
-                        <CardContent className="p-4">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <h4 className="font-medium">{item.product.name}</h4>
-                              <p className="text-sm text-gray-500">
-                                Prix: {formatCurrency(item.unitPrice)} | 
-                                Min: {item.minOrderQuantity} | 
-                                Stock: {item.stockQuantity} | 
-                                Livraison: {item.deliveryTime} jours
-                              </p>
-                            </div>
+    <ManagerLayout>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+                Approvisionnement
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Gestion des commandes et des centrales d'achat
+              </p>
+            </div>
+            <Dialog open={isNewOrderOpen} onOpenChange={setIsNewOrderOpen}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  Nouvelle Commande
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Créer une nouvelle commande d'approvisionnement</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  {/* Selection de la centrale */}
+                  <div>
+                    <Label htmlFor="center-select">Centrale d'achat</Label>
+                    <Select onValueChange={(value) => setSelectedCenter(Number(value))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une centrale d'achat" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {purchasingCenters?.map((center: any) => (
+                          <SelectItem key={center.id} value={center.id.toString()}>
                             <div className="flex items-center gap-2">
+                              <Building2 className="h-4 w-4" />
+                              <span>{center.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Produits disponibles */}
+                  {selectedCenter && centerProducts && (
+                    <div>
+                      <Label>Produits disponibles</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto">
+                        {centerProducts.map((item: any) => (
+                          <Card key={item.id} className="p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h4 className="font-medium">{item.product?.name}</h4>
+                                <p className="text-sm text-gray-600">{formatCurrency(item.unitPrice)}/unité</p>
+                                <p className="text-xs text-gray-500">Stock: {item.availableQuantity}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
                               <Input
                                 type="number"
-                                placeholder="Qté"
-                                className="w-20"
-                                min={item.minOrderQuantity}
-                                max={item.stockQuantity}
-                                onChange={(e) => {
-                                  const quantity = parseInt(e.target.value);
-                                  if (quantity >= item.minOrderQuantity) {
-                                    addProductToOrder(item, quantity);
+                                placeholder="Quantité"
+                                min="1"
+                                max={item.availableQuantity}
+                                className="flex-1"
+                                onKeyPress={(e) => {
+                                  if (e.key === 'Enter') {
+                                    const quantity = parseInt((e.target as HTMLInputElement).value);
+                                    if (quantity > 0 && quantity <= item.availableQuantity) {
+                                      addProductToOrder(item, quantity);
+                                      (e.target as HTMLInputElement).value = '';
+                                    }
                                   }
                                 }}
                               />
-                              <Button size="sm">
-                                <Plus className="h-4 w-4" />
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  const input = document.querySelector(`input[type="number"]`) as HTMLInputElement;
+                                  const quantity = parseInt(input?.value || '1');
+                                  if (quantity > 0 && quantity <= item.availableQuantity) {
+                                    addProductToOrder(item, quantity);
+                                    if (input) input.value = '';
+                                  }
+                                }}
+                              >
+                                <Plus className="h-3 w-3" />
                               </Button>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              {/* Récapitulatif de la commande */}
-              {orderItems.length > 0 && (
-                <div>
-                  <Label>Récapitulatif de la commande</Label>
-                  <Card className="mt-2">
-                    <CardContent className="p-4">
-                      {orderItems.map((item, index) => (
-                        <div key={index} className="flex justify-between items-center py-2">
-                          <span>Produit #{item.productId}</span>
-                          <span>{item.quantity} × {formatCurrency(item.unitPrice)}</span>
-                          <span className="font-medium">
-                            {formatCurrency(item.quantity * item.unitPrice)}
-                          </span>
+                  {/* Résumé de la commande */}
+                  {orderItems.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Résumé de la commande</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {orderItems.map((item, index) => (
+                            <div key={index} className="flex justify-between items-center">
+                              <span>Produit #{item.productId}</span>
+                              <span>{item.quantity} × {formatCurrency(item.unitPrice)}</span>
+                              <span className="font-medium">
+                                {formatCurrency(item.quantity * item.unitPrice)}
+                              </span>
+                            </div>
+                          ))}
+                          <hr />
+                          <div className="flex justify-between items-center font-bold">
+                            <span>Total</span>
+                            <span>
+                              {formatCurrency(orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0))}
+                            </span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <Button 
+                    onClick={handleCreateOrder} 
+                    disabled={createOrderMutation.isPending || orderItems.length === 0}
+                    className="w-full"
+                  >
+                    {createOrderMutation.isPending ? "Création..." : "Créer la commande"}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Contenu principal */}
+          <Tabs defaultValue="orders" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="orders" className="flex items-center gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Commandes
+              </TabsTrigger>
+              <TabsTrigger value="centers" className="flex items-center gap-2">
+                <Building2 className="h-4 w-4" />
+                Centrales
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Historique
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="orders" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5" />
+                    Commandes d'approvisionnement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {ordersLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="text-gray-500">Chargement des commandes...</div>
+                    </div>
+                  ) : supplyOrders?.length > 0 ? (
+                    <div className="space-y-4">
+                      {supplyOrders.map((order: any) => (
+                        <div key={order.id} className="border rounded-lg p-4 space-y-3">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium">#{order.orderNumber}</span>
+                                {getOrderStatusBadge(order.status)}
+                              </div>
+                              <p className="text-sm text-gray-600">
+                                {order.center?.name} • {formatDateTime(order.createdAt)}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-medium">{formatCurrency(order.totalAmount)}</div>
+                              <div className="text-sm text-gray-500">
+                                {order.items?.length || 0} produit(s)
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => updateOrderMutation.mutate({ 
+                                orderId: order.id, 
+                                status: order.status === 'pending' ? 'confirmed' : order.status 
+                              })}
+                              disabled={order.status === 'delivered' || order.status === 'cancelled'}
+                            >
+                              {order.status === 'pending' && 'Confirmer'}
+                              {order.status === 'confirmed' && 'Marquer comme expédiée'}
+                              {order.status === 'shipped' && 'Marquer comme livrée'}
+                              {(order.status === 'delivered' || order.status === 'cancelled') && 'Terminée'}
+                            </Button>
+                            
+                            {order.invoiceUrl && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => window.open(order.invoiceUrl, '_blank')}
+                              >
+                                <Download className="h-3 w-3 mr-1" />
+                                Facture
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       ))}
-                      <div className="border-t pt-2 mt-2">
-                        <div className="flex justify-between font-bold">
-                          <span>Total</span>
-                          <span>
-                            {formatCurrency(orderItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0))}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-
-              <Button 
-                onClick={handleCreateOrder} 
-                disabled={createOrderMutation.isPending}
-                className="w-full"
-              >
-                {createOrderMutation.isPending ? "Création..." : "Créer la commande"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <Tabs defaultValue="orders" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="orders">Mes Commandes</TabsTrigger>
-          <TabsTrigger value="centers">Centrales d'Achat</TabsTrigger>
-          <TabsTrigger value="invoices">Facturation</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="orders" className="space-y-4">
-          <div className="grid gap-4">
-            {ordersLoading ? (
-              <div>Chargement des commandes...</div>
-            ) : supplyOrders?.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Aucune commande</h3>
-                  <p className="text-gray-500 mb-4">
-                    Vous n'avez pas encore passé de commande d'approvisionnement
-                  </p>
-                  <Button onClick={() => setIsNewOrderOpen(true)}>
-                    Créer ma première commande
-                  </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      Aucune commande d'approvisionnement trouvée
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            ) : (
-              supplyOrders?.map((order: any) => (
-                <Card key={order.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{order.orderNumber}</CardTitle>
-                        <p className="text-sm text-gray-500">
-                          {order.center.name} • {formatDateTime(order.createdAt)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(order.status)}
-                        <span className="font-bold text-lg">
-                          {formatCurrency(order.totalAmount)}
-                        </span>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-between items-center">
-                      <div className="space-y-1">
-                        {order.deliveryDate && (
-                          <p className="text-sm">
-                            <strong>Livraison prévue:</strong> {formatDateTime(order.deliveryDate)}
-                          </p>
-                        )}
-                        {order.trackingNumber && (
-                          <p className="text-sm">
-                            <strong>Suivi:</strong> {order.trackingNumber}
-                          </p>
-                        )}
-                        {order.notes && (
-                          <p className="text-sm">
-                            <strong>Notes:</strong> {order.notes}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {order.invoiceUrl && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => downloadInvoice(order.invoiceUrl, order.orderNumber)}
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Facture
-                          </Button>
-                        )}
-                        {order.status === "pending" && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => updateStatusMutation.mutate({ orderId: order.id, status: "cancelled" })}
-                          >
-                            Annuler
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
+            </TabsContent>
 
-        <TabsContent value="centers" className="space-y-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {centersLoading ? (
-              <div>Chargement des centrales...</div>
-            ) : (
-              purchasingCenters?.map((center: any) => (
-                <Card key={center.id}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5" />
-                      {center.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        <strong>Ville:</strong> {center.city}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Téléphone:</strong> {center.phone}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Email:</strong> {center.email}
-                      </p>
-                      <div>
-                        <p className="text-sm font-medium">Spécialités:</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {center.specialties?.map((specialty: string, index: number) => (
-                            <Badge key={index} variant="secondary" className="text-xs">
-                              {specialty}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Zones de livraison:</p>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {center.deliveryZones?.map((zone: string, index: number) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {zone}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
+            <TabsContent value="centers" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Centrales d'achat partenaires
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {purchasingCenters?.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {purchasingCenters.map((center: any) => (
+                        <Card key={center.id} className="p-4">
+                          <div className="flex items-start gap-3">
+                            <Building2 className="h-8 w-8 text-blue-600 flex-shrink-0" />
+                            <div className="flex-1">
+                              <h3 className="font-medium">{center.name}</h3>
+                              <p className="text-sm text-gray-600 mb-2">{center.address}</p>
+                              <div className="space-y-1 text-xs text-gray-500">
+                                <p>Email: {center.contactEmail}</p>
+                                <p>Tél: {center.contactPhone}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
                     </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      Aucune centrale d'achat disponible
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-        <TabsContent value="invoices" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Facturation
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {supplyOrders?.filter((order: any) => order.invoiceUrl).map((order: any) => (
-                  <div key={order.id} className="flex justify-between items-center p-4 border rounded-lg">
-                    <div>
-                      <h4 className="font-medium">{order.orderNumber}</h4>
-                      <p className="text-sm text-gray-500">
-                        {order.center.name} • {formatDateTime(order.createdAt)}
-                      </p>
-                      <p className="font-bold">{formatCurrency(order.totalAmount)}</p>
-                    </div>
-                    <Button 
-                      variant="outline"
-                      onClick={() => downloadInvoice(order.invoiceUrl, order.orderNumber)}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Télécharger
-                    </Button>
+            <TabsContent value="history" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Historique des approvisionnements
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 text-gray-500">
+                    Fonctionnalité d'historique en cours de développement
                   </div>
-                ))}
-                
-                {(!supplyOrders || supplyOrders.filter((order: any) => order.invoiceUrl).length === 0) && (
-                  <div className="text-center py-8">
-                    <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">Aucune facture</h3>
-                    <p className="text-gray-500">
-                      Les factures apparaîtront ici une fois vos commandes confirmées
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </ManagerLayout>
   );
 }
