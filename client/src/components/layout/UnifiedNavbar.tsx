@@ -33,10 +33,10 @@ export default function UnifiedNavbar() {
   };
 
   const managerLinks = [
-    { href: "/manager", label: "Tableau de bord", icon: BarChart3 },
+    { href: "/manager", label: "Tableau", icon: BarChart3 },
     { href: "/manager/orders", label: "Commandes", icon: ShoppingBag },
     { href: "/manager/inventory", label: "Inventaire", icon: Package },
-    { href: "/manager/supply", label: "Approvisionnement", icon: Truck },
+    { href: "/manager/supply", label: "Appro", icon: Truck },
     { href: "/manager/sales", label: "Ventes", icon: TrendingUp },
     { href: "/manager/customers", label: "Clients", icon: Users },
     { href: "/manager/analytics", label: "Analyses", icon: BarChart3 },
@@ -108,8 +108,8 @@ export default function UnifiedNavbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation - Full size (XL and up) */}
-          <div className="hidden xl:flex items-center space-x-3 flex-1 justify-center overflow-hidden mx-4">
+          {/* Desktop Navigation - Large screens (LG and up) */}
+          <div className="hidden lg:flex items-center space-x-2 flex-1 justify-center mx-3">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
               const isActive = isActiveLink(link.href);
@@ -118,13 +118,13 @@ export default function UnifiedNavbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center gap-2 px-3 text-sm whitespace-nowrap ${
+                    className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm whitespace-nowrap ${
                       isActive 
                         ? navbar.navTextActive 
                         : `${navbar.navText} ${navbar.navHover}`
                     }`}
                   >
-                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <Icon className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
                     <span>{link.label}</span>
                   </Button>
                 </Link>
@@ -132,8 +132,8 @@ export default function UnifiedNavbar() {
             })}
           </div>
 
-          {/* Desktop Navigation - Medium size (LG to XL) */}
-          <div className="hidden lg:flex xl:hidden items-center space-x-1 flex-1 justify-center overflow-hidden mx-2">
+          {/* Desktop Navigation - Medium screens (MD to LG) - Icons only */}
+          <div className="hidden md:flex lg:hidden items-center space-x-1 flex-1 justify-center mx-2">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
               const isActive = isActiveLink(link.href);
@@ -142,37 +142,14 @@ export default function UnifiedNavbar() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center gap-1 px-2 text-xs whitespace-nowrap ${
+                    className={`flex items-center justify-center p-2 ${
                       isActive 
                         ? navbar.navTextActive 
                         : `${navbar.navText} ${navbar.navHover}`
                     }`}
+                    title={link.label}
                   >
-                    <Icon className="h-3 w-3 flex-shrink-0" />
-                    <span className="truncate">{link.label}</span>
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Desktop Navigation - Compact (MD to LG) */}
-          <div className="hidden md:flex lg:hidden items-center space-x-1 flex-1 justify-center overflow-hidden mx-1">
-            {getCurrentLinks().slice(0, 5).map((link) => {
-              const Icon = link.icon;
-              const isActive = isActiveLink(link.href);
-              return (
-                <Link key={link.href} href={link.href}>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`flex items-center gap-1 px-1 text-xs whitespace-nowrap ${
-                      isActive 
-                        ? navbar.navTextActive 
-                        : `${navbar.navText} ${navbar.navHover}`
-                    }`}
-                  >
-                    <Icon className="h-3 w-3 flex-shrink-0" />
+                    <Icon className="h-4 w-4 flex-shrink-0" />
                   </Button>
                 </Link>
               );
@@ -283,6 +260,10 @@ export default function UnifiedNavbar() {
                     {getCurrentLinks().map((link) => {
                       const Icon = link.icon;
                       const isActive = isActiveLink(link.href);
+                      // Afficher le nom complet dans le menu mobile
+                      const fullLabel = link.href === "/manager" ? "Tableau de bord" : 
+                                       link.href === "/manager/supply" ? "Approvisionnement" : 
+                                       link.label;
                       return (
                         <Link key={link.href} href={link.href}>
                           <Button
@@ -291,7 +272,7 @@ export default function UnifiedNavbar() {
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="mr-2 h-4 w-4" />
-                            {link.label}
+                            {fullLabel}
                           </Button>
                         </Link>
                       );
