@@ -193,7 +193,7 @@ export default function ManagerOrders() {
             </CardContent>
           </Card>
 
-          {/* Orders List */}
+          {/* Orders List - Responsive */}
           <Card>
             <CardHeader>
               <CardTitle>Commandes ({filteredOrders.length})</CardTitle>
@@ -203,50 +203,57 @@ export default function ManagerOrders() {
                 {filteredOrders.map((order: any) => (
                   <div
                     key={order.id}
-                    className="flex items-center justify-between p-6 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 bg-gray-50 dark:bg-gray-800 rounded-xl"
                   >
-                    <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-white dark:bg-gray-700 rounded-lg">
+                    {/* Info principale - Mobile d'abord */}
+                    <div className="flex items-start space-x-3 mb-4 sm:mb-0 sm:flex-1">
+                      <div className="p-3 bg-white dark:bg-gray-700 rounded-xl shadow-sm flex-shrink-0">
                         {getStatusIcon(order.status)}
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          Commande #CMD-{order.id.toString().padStart(3, "0")}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 dark:text-white text-sm sm:text-base">
+                          #CMD-{order.id.toString().padStart(3, "0")}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                           {order.customer.firstName} {order.customer.lastName}
                         </p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {formatDateTime(order.createdAt)} • {order.type === "delivery" ? "Livraison" : "Retrait"}
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                          {formatDateTime(order.createdAt)}
                         </p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Badge className={getOrderStatusClassName(order.status)} variant="secondary">
+                            {getOrderStatusLabel(order.status)}
+                          </Badge>
+                          <span className="text-xs text-gray-500">
+                            {order.type === "delivery" ? "Livraison" : "Retrait"}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-4">
-                      <div className="text-right">
-                        <p className="font-medium text-gray-900 dark:text-white">
+                    {/* Prix et actions */}
+                    <div className="flex items-center justify-between sm:justify-end space-x-3">
+                      <div className="text-left sm:text-right">
+                        <p className="font-bold text-lg text-gray-900 dark:text-white">
                           {formatCurrency(order.totalAmount)}
                         </p>
-                        <Badge className={getOrderStatusClassName(order.status)}>
-                          {getOrderStatusLabel(order.status)}
-                        </Badge>
                       </div>
 
                       <div className="flex items-center space-x-2">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="icon">
+                            <Button variant="outline" size="icon" className="rounded-xl">
                               <Eye className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
+                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>
                                 Détails de la commande #CMD-{order.id.toString().padStart(3, "0")}
                               </DialogTitle>
                             </DialogHeader>
                             <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                   <h4 className="font-medium mb-2">Client</h4>
                                   <p>{order.customer.firstName} {order.customer.lastName}</p>
@@ -282,6 +289,7 @@ export default function ManagerOrders() {
                             size="sm"
                             onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
                             disabled={updateOrderMutation.isPending}
+                            className="rounded-xl hidden sm:block"
                           >
                             {getNextStatusLabel(order.status)}
                           </Button>
@@ -293,11 +301,38 @@ export default function ManagerOrders() {
                             size="sm"
                             onClick={() => handleStatusUpdate(order.id, "cancelled")}
                             disabled={updateOrderMutation.isPending}
+                            className="rounded-xl hidden sm:block"
                           >
                             Annuler
                           </Button>
                         )}
                       </div>
+                    </div>
+
+                    {/* Actions mobiles */}
+                    <div className="flex gap-2 mt-3 sm:hidden">
+                      {getNextStatus(order.status) && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleStatusUpdate(order.id, getNextStatus(order.status)!)}
+                          disabled={updateOrderMutation.isPending}
+                          className="flex-1 rounded-xl"
+                        >
+                          {getNextStatusLabel(order.status)}
+                        </Button>
+                      )}
+
+                      {order.status !== "delivered" && order.status !== "cancelled" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleStatusUpdate(order.id, "cancelled")}
+                          disabled={updateOrderMutation.isPending}
+                          className="flex-1 rounded-xl"
+                        >
+                          Annuler
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}

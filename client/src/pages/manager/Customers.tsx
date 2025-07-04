@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ManagerLayout from "@/components/layout/ManagerLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,16 +7,121 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { 
   Users, Search, Star, Crown, ShoppingBag, Phone, 
-  Mail, MapPin, TrendingUp, Calendar
+  Mail, MapPin, TrendingUp, Calendar, Plus, UserPlus
 } from "lucide-react";
 import { formatCurrency, formatDate, getLoyaltyLevel } from "@/lib/utils";
 
 export default function ManagerCustomers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+    dateOfBirth: ""
+  });
+
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Données fake des clients
+  const fakeCustomers = [
+    {
+      id: 101,
+      firstName: "Aminata",
+      lastName: "Diallo",
+      email: "aminata.diallo@gmail.com",
+      phone: "+221 77 123 4567",
+      address: "Plateau, Dakar",
+      dateOfBirth: "1985-03-15",
+      createdAt: "2024-12-01T10:00:00Z",
+      totalSpent: 450000,
+      totalOrders: 25,
+      lastOrder: "2024-12-30",
+      loyaltyPoints: 1250
+    },
+    {
+      id: 102,
+      firstName: "Ousmane",
+      lastName: "Sow",
+      email: "ousmane.sow@hotmail.com",
+      phone: "+221 78 234 5678",
+      address: "Almadies, Dakar",
+      dateOfBirth: "1990-07-22",
+      createdAt: "2024-11-15T14:30:00Z",
+      totalSpent: 320000,
+      totalOrders: 18,
+      lastOrder: "2024-12-28",
+      loyaltyPoints: 890
+    },
+    {
+      id: 103,
+      firstName: "Fatou",
+      lastName: "Ba",
+      email: "fatou.ba@yahoo.fr",
+      phone: "+221 76 345 6789",
+      address: "Mermoz, Dakar",
+      dateOfBirth: "1987-11-08",
+      createdAt: "2024-10-20T09:15:00Z",
+      totalSpent: 280000,
+      totalOrders: 15,
+      lastOrder: "2024-12-25",
+      loyaltyPoints: 750
+    },
+    {
+      id: 104,
+      firstName: "Mamadou",
+      lastName: "Fall",
+      email: "mamadou.fall@gmail.com",
+      phone: "+221 77 456 7890",
+      address: "Sacré-Cœur, Dakar",
+      dateOfBirth: "1992-05-12",
+      createdAt: "2024-12-20T16:45:00Z",
+      totalSpent: 125000,
+      totalOrders: 8,
+      lastOrder: "2024-12-29",
+      loyaltyPoints: 340
+    },
+    {
+      id: 105,
+      firstName: "Aïcha",
+      lastName: "Ndiaye",
+      email: "aicha.ndiaye@outlook.com",
+      phone: "+221 78 567 8901",
+      address: "Point E, Dakar",
+      dateOfBirth: "1989-09-30",
+      createdAt: "2024-12-25T11:20:00Z",
+      totalSpent: 95000,
+      totalOrders: 6,
+      lastOrder: "2024-12-31",
+      loyaltyPoints: 280
+    },
+    {
+      id: 106,
+      firstName: "Ibrahima",
+      lastName: "Sarr",
+      email: "ibrahima.sarr@gmail.com",
+      phone: "+221 76 678 9012",
+      address: "Fann, Dakar",
+      dateOfBirth: "1994-01-18",
+      createdAt: "2024-12-28T08:30:00Z",
+      totalSpent: 65000,
+      totalOrders: 4,
+      lastOrder: "2024-12-30",
+      loyaltyPoints: 180
+    }
+  ];
 
   // Fetch customers data
   const { data: customers, isLoading } = useQuery({
@@ -33,41 +138,69 @@ export default function ManagerCustomers() {
     queryKey: ["/api/orders"],
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
+  // Ajouter un nouveau client
+  const addCustomerMutation = useMutation({
+    mutationFn: async (customerData: any) => {
+      return apiRequest("POST", "/api/users", {
+        ...customerData,
+        role: "customer",
+        username: customerData.email,
+        password: "defaultPassword123"
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Client ajouté",
+        description: "Le nouveau client a été ajouté avec succès.",
+      });
+      setIsAddDialogOpen(false);
+      setNewCustomer({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        address: "",
+        dateOfBirth: ""
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter le client.",
+        variant: "destructive",
+      });
+    },
+  });
 
-  const filteredCustomers = customers?.filter((customer: any) =>
+  // Utiliser les données fake au lieu des vraies données pour la démonstration
+  const allCustomers = [...fakeCustomers, ...(customers || [])];
+
+  const filteredCustomers = allCustomers.filter((customer: any) =>
     customer.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    customer.lastName.toLowerCase().toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  );
 
-  const getCustomerStats = (customerId: number) => {
-    const customerOrders = orders?.filter((order: any) => order.customerId === customerId) || [];
-    const totalSpent = customerOrders.reduce((sum: number, order: any) => sum + parseFloat(order.totalAmount), 0);
-    const loyalty = loyaltyData?.find((lp: any) => lp.customerId === customerId);
-    
-    return {
-      totalOrders: customerOrders.length,
-      totalSpent,
-      loyalty: loyalty ? getLoyaltyLevel(loyalty.points) : null,
-      lastOrder: customerOrders.length > 0 ? new Date(Math.max(...customerOrders.map((o: any) => new Date(o.createdAt).getTime()))) : null
-    };
+  const topCustomers = [...fakeCustomers]
+    .sort((a, b) => b.totalSpent - a.totalSpent)
+    .slice(0, 10);
+
+  const recentCustomers = [...fakeCustomers]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 10);
+
+  const handleAddCustomer = () => {
+    if (!newCustomer.firstName || !newCustomer.lastName || !newCustomer.email) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires.",
+        variant: "destructive",
+      });
+      return;
+    }
+    addCustomerMutation.mutate(newCustomer);
   };
-
-  const topCustomers = filteredCustomers
-    .map((customer: any) => ({ ...customer, stats: getCustomerStats(customer.id) }))
-    .sort((a: any, b: any) => b.stats.totalSpent - a.stats.totalSpent)
-    .slice(0, 10);
-
-  const recentCustomers = filteredCustomers
-    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 10);
 
   return (
     <ManagerLayout>
@@ -92,10 +225,100 @@ export default function ManagerCustomers() {
               className="pl-10"
             />
           </div>
-          <Button className="whitespace-nowrap">
-            <Users className="h-4 w-4 mr-2" />
-            Ajouter Client
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="whitespace-nowrap rounded-xl">
+                <UserPlus className="h-4 w-4 mr-2" />
+                Ajouter Client
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Ajouter un nouveau client</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="firstName">Prénom *</Label>
+                    <Input
+                      id="firstName"
+                      placeholder="Prénom"
+                      value={newCustomer.firstName}
+                      onChange={(e) => setNewCustomer({...newCustomer, firstName: e.target.value})}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">Nom *</Label>
+                    <Input
+                      id="lastName"
+                      placeholder="Nom"
+                      value={newCustomer.lastName}
+                      onChange={(e) => setNewCustomer({...newCustomer, lastName: e.target.value})}
+                      className="rounded-xl"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="email@exemple.com"
+                    value={newCustomer.email}
+                    onChange={(e) => setNewCustomer({...newCustomer, email: e.target.value})}
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Téléphone</Label>
+                  <Input
+                    id="phone"
+                    placeholder="+221 77 123 4567"
+                    value={newCustomer.phone}
+                    onChange={(e) => setNewCustomer({...newCustomer, phone: e.target.value})}
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address">Adresse</Label>
+                  <Input
+                    id="address"
+                    placeholder="Adresse complète"
+                    value={newCustomer.address}
+                    onChange={(e) => setNewCustomer({...newCustomer, address: e.target.value})}
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="dateOfBirth">Date de naissance</Label>
+                  <Input
+                    id="dateOfBirth"
+                    type="date"
+                    value={newCustomer.dateOfBirth}
+                    onChange={(e) => setNewCustomer({...newCustomer, dateOfBirth: e.target.value})}
+                    className="rounded-xl"
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAddDialogOpen(false)}
+                    className="flex-1 rounded-xl"
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    onClick={handleAddCustomer}
+                    disabled={addCustomerMutation.isPending}
+                    className="flex-1 rounded-xl"
+                  >
+                    {addCustomerMutation.isPending ? "Ajout..." : "Ajouter"}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -119,7 +342,7 @@ export default function ManagerCustomers() {
               <Crown className="h-8 w-8 text-yellow-600" />
               <div>
                 <p className="text-2xl font-bold">
-                  {topCustomers.filter(c => c.stats.loyalty?.level !== "Bronze").length}
+                  {fakeCustomers.filter(c => c.loyaltyPoints > 500).length}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Clients VIP</p>
               </div>
@@ -133,7 +356,7 @@ export default function ManagerCustomers() {
               <TrendingUp className="h-8 w-8 text-green-600" />
               <div>
                 <p className="text-2xl font-bold">
-                  {recentCustomers.filter(c => 
+                  {fakeCustomers.filter(c => 
                     new Date(c.createdAt).getTime() > Date.now() - 30 * 24 * 60 * 60 * 1000
                   ).length}
                 </p>
@@ -150,7 +373,7 @@ export default function ManagerCustomers() {
               <div>
                 <p className="text-2xl font-bold">
                   {formatCurrency(
-                    topCustomers.reduce((sum, c) => sum + c.stats.totalSpent, 0)
+                    fakeCustomers.reduce((sum, c) => sum + c.totalSpent, 0)
                   )}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">CA Total</p>

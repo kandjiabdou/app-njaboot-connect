@@ -83,6 +83,23 @@ export default function ManagerInventory() {
 
   const lowStockItems = inventory?.filter((item: any) => item.quantity <= item.minStock) || [];
 
+  // Fonction pour obtenir l'image du produit
+  const getProductImage = (productName: string) => {
+    const name = productName.toLowerCase();
+    if (name.includes('riz')) return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=64&h=64&fit=crop';
+    if (name.includes('huile')) return 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=64&h=64&fit=crop';
+    if (name.includes('sucre')) return 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=64&h=64&fit=crop';
+    if (name.includes('farine')) return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=64&h=64&fit=crop';
+    if (name.includes('lait')) return 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=64&h=64&fit=crop';
+    if (name.includes('pain')) return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=64&h=64&fit=crop';
+    if (name.includes('tomate')) return 'https://images.unsplash.com/photo-1546470427-e1357b94edff?w=64&h=64&fit=crop';
+    if (name.includes('pomme')) return 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=64&h=64&fit=crop';
+    if (name.includes('banane')) return 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=64&h=64&fit=crop';
+    if (name.includes('poisson')) return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=64&h=64&fit=crop';
+    if (name.includes('viande')) return 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=64&h=64&fit=crop';
+    return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=64&h=64&fit=crop';
+  };
+
   if (inventoryLoading) {
     return (
       <ManagerLayout>
@@ -189,11 +206,18 @@ export default function ManagerInventory() {
                     <tr key={item.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-800">
                       <td className="p-4">
                         <div className="flex items-center space-x-3">
-                          <div className="h-10 w-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                            <Package className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                          <div className="h-12 w-12 rounded-xl bg-gray-100 overflow-hidden shadow-sm flex-shrink-0">
+                            <img
+                              src={getProductImage(item.product.name)}
+                              alt={item.product.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/api/placeholder/48/48';
+                              }}
+                            />
                           </div>
-                          <div>
-                            <div className="font-medium">{item.product.name}</div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-gray-900 dark:text-white truncate">{item.product.name}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
                               {item.product.unit}
                             </div>

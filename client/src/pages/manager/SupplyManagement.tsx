@@ -333,29 +333,33 @@ export default function SupplyManagement() {
                   ) : supplyOrders?.length > 0 ? (
                     <div className="space-y-4">
                       {supplyOrders.map((order: any) => (
-                        <div key={order.id} className="border rounded-lg p-4 space-y-3">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-medium">#{order.orderNumber}</span>
+                        <div key={order.id} className="border rounded-xl p-4 space-y-3 bg-white dark:bg-gray-800/50 shadow-sm">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <span className="font-medium text-lg">#{order.orderNumber}</span>
                                 {getOrderStatusBadge(order.status)}
                               </div>
-                              <p className="text-sm text-gray-600">
-                                {order.center?.name} • {formatDateTime(order.createdAt)}
+                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
+                                {order.center?.name}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-500">
+                                {formatDateTime(order.createdAt)}
                               </p>
                             </div>
-                            <div className="text-right">
-                              <div className="font-medium">{formatCurrency(order.totalAmount)}</div>
-                              <div className="text-sm text-gray-500">
+                            <div className="text-left sm:text-right">
+                              <div className="font-bold text-lg text-gray-900 dark:text-white">{formatCurrency(order.totalAmount)}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
                                 {order.items?.length || 0} produit(s)
                               </div>
                             </div>
                           </div>
                           
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <Button 
                               variant="outline" 
                               size="sm"
+                              className="rounded-xl flex-1 sm:flex-none"
                               onClick={() => updateOrderMutation.mutate({ 
                                 orderId: order.id, 
                                 status: order.status === 'pending' ? 'confirmed' : order.status 
@@ -372,10 +376,12 @@ export default function SupplyManagement() {
                               <Button 
                                 variant="outline" 
                                 size="sm"
+                                className="rounded-xl flex-1 sm:flex-none"
                                 onClick={() => window.open(order.invoiceUrl, '_blank')}
                               >
                                 <Download className="h-3 w-3 mr-1" />
-                                Facture
+                                <span className="hidden sm:inline">Facture</span>
+                                <span className="sm:hidden">PDF</span>
                               </Button>
                             )}
                           </div>

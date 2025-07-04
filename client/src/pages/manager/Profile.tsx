@@ -99,105 +99,114 @@ export default function ManagerProfile() {
   return (
     <ManagerLayout>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center space-x-4">
-          <Avatar className="h-16 w-16">
-            <AvatarFallback className="text-lg font-bold">
-              {user.firstName[0]}{user.lastName[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-              {user.firstName} {user.lastName}
-            </h1>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                <Briefcase className="h-3 w-3 mr-1" />
-                Gérant de Magasin
-              </Badge>
-              {store && (
-                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                  <Store className="h-3 w-3 mr-1" />
-                  {store.name}
+      <div className="flex flex-col gap-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-16 w-16 rounded-2xl shadow-lg">
+              <AvatarFallback className="text-lg font-bold rounded-2xl bg-gradient-to-br from-yellow-400 to-yellow-600 text-white">
+                {user.firstName[0]}{user.lastName[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                {user.firstName} {user.lastName}
+              </h1>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 rounded-xl w-fit">
+                  <Briefcase className="h-3 w-3 mr-1" />
+                  Gérant de Magasin
                 </Badge>
-              )}
+                {store && (
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 rounded-xl w-fit">
+                    <Store className="h-3 w-3 mr-1" />
+                    {store.name}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
+          
+          <Button 
+            onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
+            disabled={updateProfileMutation.isPending}
+            className="rounded-xl w-full sm:w-auto"
+          >
+            {isEditing ? (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                {updateProfileMutation.isPending ? "Sauvegarde..." : "Sauvegarder"}
+              </>
+            ) : (
+              <>
+                <User className="h-4 w-4 mr-2" />
+                Modifier le profil
+              </>
+            )}
+          </Button>
         </div>
-        
-        <Button 
-          onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
-          disabled={updateProfileMutation.isPending}
-        >
-          {isEditing ? (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              {updateProfileMutation.isPending ? "Sauvegarde..." : "Sauvegarder"}
-            </>
-          ) : (
-            <>
-              <User className="h-4 w-4 mr-2" />
-              Modifier le profil
-            </>
-          )}
-        </Button>
       </div>
 
       {/* Manager Performance Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-green-700 dark:text-green-400">
                   CA Total
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-green-900 dark:text-green-300">
                   {formatCurrency(managerStats.totalRevenue)}
                 </p>
               </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
+              <div className="p-3 bg-green-500 rounded-2xl">
+                <TrendingUp className="h-8 w-8 text-white" />
+              </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-green-600">Performance mensuelle</span>
+              <span className="text-green-600 dark:text-green-400">Performance mensuelle</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
                   Commandes Gérées
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-blue-900 dark:text-blue-300">
                   {managerStats.totalOrders}
                 </p>
               </div>
-              <ShoppingBag className="h-8 w-8 text-blue-600" />
+              <div className="p-3 bg-blue-500 rounded-2xl">
+                <ShoppingBag className="h-8 w-8 text-white" />
+              </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Ce mois-ci</span>
+              <span className="text-blue-600 dark:text-blue-400">Ce mois-ci</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl shadow-lg border-0 bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
                   Note du Magasin
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-300">
                   {managerStats.storeRating}/5
                 </p>
               </div>
-              <Building2 className="h-8 w-8 text-yellow-600" />
+              <div className="p-3 bg-yellow-500 rounded-2xl">
+                <Building2 className="h-8 w-8 text-white" />
+              </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-yellow-600">Excellent service</span>
+              <span className="text-yellow-600 dark:text-yellow-400">Excellent service</span>
             </div>
           </CardContent>
         </Card>
