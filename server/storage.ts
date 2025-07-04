@@ -814,47 +814,59 @@ export class MemStorage implements IStorage {
   }
 
   private initializePurchasingCenters() {
-    // Centrales d'achat
+    // Centrales d'achat sénégalaises
     const centers = [
       {
         id: 1,
-        name: "Central D'Achat Plateau",
-        address: "Zone Industrielle Plateau, Abidjan",
-        city: "Abidjan",
-        phone: "+225 20 30 40 50",
-        email: "plateau@central-achat.ci",
-        specialties: ["Céréales", "Légumes", "Fruits"],
-        deliveryZones: ["Plateau", "Cocody", "Marcory"],
+        name: "SOGROS Dakar",
+        address: "Zone Industrielle de Dakar, Route de Rufisque",
+        city: "Dakar",
+        phone: "+221 33 849 25 00",
+        email: "commandes@sogros.sn",
+        specialties: ["Produits alimentaires", "Boissons", "Épices", "Conserves"],
+        deliveryZones: ["Dakar", "Pikine", "Guédiawaye"],
         isActive: true,
         createdAt: new Date("2024-01-15")
       },
       {
         id: 2,
-        name: "Central D'Achat Treichville",
-        address: "Boulevard de Marseille, Treichville",
-        city: "Abidjan",
-        phone: "+225 21 25 30 35",
-        email: "treichville@central-achat.ci",
-        specialties: ["Viandes", "Poissons", "Laitiers"],
-        deliveryZones: ["Treichville", "Port-Bouët", "Koumassi"],
+        name: "CDEPS Thiès",
+        address: "Zone Commerciale de Thiès, Avenue Lamine Guèye",
+        city: "Thiès",
+        phone: "+221 33 951 12 34",
+        email: "approvisionnement@cdeps.sn",
+        specialties: ["Céréales", "Légumineuses", "Huiles", "Sucre"],
+        deliveryZones: ["Thiès", "Diourbel", "Kaolack"],
         isActive: true,
         createdAt: new Date("2024-01-20")
       },
       {
         id: 3,
-        name: "Central D'Achat Yopougon",
-        address: "Quartier Niangon, Yopougon",
-        city: "Abidjan",
-        phone: "+225 23 45 67 89",
-        email: "yopougon@central-achat.ci",
-        specialties: ["Céréales", "Légumes", "Viandes"],
-        deliveryZones: ["Yopougon", "Abobo", "Anyama"],
+        name: "SENMARKET Saint-Louis",
+        address: "Quartier Sud, Route de Richard Toll",
+        city: "Saint-Louis",
+        phone: "+221 33 961 45 67",
+        email: "ventes@senmarket.sn",
+        specialties: ["Riz local", "Mil", "Arachides", "Bissap"],
+        deliveryZones: ["Saint-Louis", "Louga", "Matam"],
         isActive: true,
         createdAt: new Date("2024-02-01")
+      },
+      {
+        id: 4,
+        name: "AGROCENTER Kaolack",
+        address: "Marché Central, Avenue Valdiodio Ndiaye",
+        city: "Kaolack",
+        phone: "+221 33 941 78 90",
+        email: "commandes@agrocenter.sn",
+        specialties: ["Produits frais", "Légumes", "Fruits", "Viandes"],
+        deliveryZones: ["Kaolack", "Fatick", "Kaffrine"],
+        isActive: true,
+        createdAt: new Date("2024-02-10")
       }
     ];
     centers.forEach(center => this.purchasingCenters.set(center.id, center));
-    this.currentPurchasingCenterId = 4;
+    this.currentPurchasingCenterId = 5;
 
     // Produits des centrales
     const centerProducts = [

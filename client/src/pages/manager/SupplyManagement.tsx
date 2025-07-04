@@ -38,49 +38,7 @@ export default function SupplyManagement() {
   const [isNewOrderOpen, setIsNewOrderOpen] = useState(false);
   const [orderItems, setOrderItems] = useState<Array<{productId: number, quantity: number, unitPrice: number}>>([]);
 
-  // Données des centrales d'achat sénégalaises
-  const senegalCenters = [
-    {
-      id: 1,
-      name: "SOGROS Dakar",
-      address: "Zone Industrielle de Dakar, Route de Rufisque",
-      city: "Dakar",
-      contactEmail: "commandes@sogros.sn",
-      contactPhone: "+221 33 849 25 00",
-      description: "Centrale d'achat alimentaire leader au Sénégal",
-      specialties: ["Produits alimentaires", "Boissons", "Épices", "Conserves"]
-    },
-    {
-      id: 2,
-      name: "CDEPS Thiès",
-      address: "Zone Commerciale de Thiès, Avenue Lamine Guèye",
-      city: "Thiès", 
-      contactEmail: "approvisionnement@cdeps.sn",
-      contactPhone: "+221 33 951 12 34",
-      description: "Centre de distribution pour l'ensemble du pays",
-      specialties: ["Céréales", "Légumineuses", "Huiles", "Sucre"]
-    },
-    {
-      id: 3,
-      name: "SENMARKET Saint-Louis",
-      address: "Quartier Sud, Route de Richard Toll",
-      city: "Saint-Louis",
-      contactEmail: "ventes@senmarket.sn", 
-      contactPhone: "+221 33 961 45 67",
-      description: "Spécialisé dans les produits du terroir sénégalais",
-      specialties: ["Riz local", "Mil", "Arachides", "Bissap"]
-    },
-    {
-      id: 4,
-      name: "AGROCENTER Kaolack",
-      address: "Marché Central, Avenue Valdiodio Ndiaye",
-      city: "Kaolack",
-      contactEmail: "commandes@agrocenter.sn",
-      contactPhone: "+221 33 941 78 90",
-      description: "Centrale agricole pour le bassin arachidier",
-      specialties: ["Produits frais", "Légumes", "Fruits", "Viandes"]
-    }
-  ];
+
 
   // Fetch store data
   const { data: store } = useQuery({
@@ -491,7 +449,7 @@ export default function SupplyManagement() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {senegalCenters.map((center) => (
+                    {purchasingCenters?.map((center: any) => (
                       <Card key={center.id} className="rounded-2xl border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800/50">
                         <CardContent className="p-5">
                           {/* Header avec icône et ville */}
@@ -514,10 +472,10 @@ export default function SupplyManagement() {
                           {/* Description */}
                           <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-4">
                             <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                              {center.description}
+                              Centrale d'approvisionnement de {center.city}
                             </p>
                             <div className="flex flex-wrap gap-1">
-                              {center.specialties.map((specialty, index) => (
+                              {center.specialties?.map((specialty: string, index: number) => (
                                 <Badge key={index} variant="secondary" className="text-xs rounded-lg">
                                   {specialty}
                                 </Badge>
@@ -533,33 +491,33 @@ export default function SupplyManagement() {
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                               <span>📧</span>
-                              <span>{center.contactEmail}</span>
+                              <span>{center.email}</span>
                             </div>
                             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                               <span>📞</span>
-                              <span>{center.contactPhone}</span>
+                              <span>{center.phone}</span>
                             </div>
                           </div>
 
                           {/* Actions */}
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <Button 
                               variant="outline" 
-                              className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50"
+                              className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 text-sm"
                               onClick={() => setSelectedCenter(center.id)}
                             >
-                              <Package className="h-4 w-4 mr-2" />
-                              Voir produits
+                              <Package className="h-4 w-4 mr-1" />
+                              <span className="truncate">Voir produits</span>
                             </Button>
                             <Button 
-                              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700"
+                              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 text-sm"
                               onClick={() => {
                                 setSelectedCenter(center.id);
                                 setIsNewOrderOpen(true);
                               }}
                             >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Commander
+                              <Plus className="h-4 w-4 mr-1" />
+                              <span className="truncate">Commander</span>
                             </Button>
                           </div>
                         </CardContent>
@@ -604,7 +562,7 @@ export default function SupplyManagement() {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Choisissez une centrale d'achat</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {senegalCenters.map((center) => (
+                {purchasingCenters?.map((center: any) => (
                   <Card 
                     key={center.id} 
                     className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-green-500"
@@ -621,12 +579,12 @@ export default function SupplyManagement() {
                           <p className="text-sm text-gray-600 mt-2">{center.description}</p>
                           
                           <div className="flex flex-wrap gap-1 mt-3">
-                            {center.specialties.slice(0, 3).map((specialty, index) => (
+                            {center.specialties?.slice(0, 3).map((specialty: string, index: number) => (
                               <Badge key={index} variant="secondary" className="text-xs">
                                 {specialty}
                               </Badge>
                             ))}
-                            {center.specialties.length > 3 && (
+                            {center.specialties?.length > 3 && (
                               <Badge variant="secondary" className="text-xs">
                                 +{center.specialties.length - 3}
                               </Badge>
@@ -646,7 +604,7 @@ export default function SupplyManagement() {
                 <div>
                   <h3 className="text-lg font-semibold">Sélectionnez les produits</h3>
                   <p className="text-sm text-gray-600">
-                    Centrale: {senegalCenters.find(c => c.id === selectedCenter)?.name}
+                    Centrale: {purchasingCenters?.find((c: any) => c.id === selectedCenter)?.name}
                   </p>
                 </div>
                 <Button 
