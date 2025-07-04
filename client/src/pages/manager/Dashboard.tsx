@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useThemeClasses } from "@/lib/theme";
 import { formatCurrency, getOrderStatusLabel, getOrderStatusClassName } from "@/lib/utils";
 import { apiRequest } from "@/lib/queryClient";
 import {
@@ -46,6 +47,7 @@ export default function ManagerDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [newSaleOpen, setNewSaleOpen] = useState(false);
+  const { page } = useThemeClasses('manager');
 
   const form = useForm<NewSaleForm>({
     resolver: zodResolver(newSaleSchema),
@@ -127,11 +129,11 @@ export default function ManagerDashboard() {
   return (
     <ManagerLayout>
       {/* Header */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+      <div className={`mb-6 md:mb-8 p-6 rounded-lg ${page.pageHeader}`}>
+        <h1 className="text-2xl md:text-3xl font-bold">
           Tableau de Bord
         </h1>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="opacity-90">
           Gérez votre boutique Njaboot Connect
         </p>
       </div>
@@ -219,7 +221,7 @@ export default function ManagerDashboard() {
             <CardContent className="grid grid-cols-1 gap-3">
               <Dialog open={newSaleOpen} onOpenChange={setNewSaleOpen}>
                 <DialogTrigger asChild>
-                  <Button className="w-full justify-start">
+                  <Button className={`w-full justify-start ${page.buttonPrimary}`}>
                     <DollarSign className="mr-2 h-4 w-4" />
                     Nouvelle Vente
                   </Button>

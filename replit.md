@@ -89,6 +89,7 @@ The application is designed to run in Replit's environment with specific configu
 ## Changelog
 - June 23, 2025. Initial setup
 - January 3, 2025. Brand color system implemented with design tokens and theme management
+- January 3, 2025. Comprehensive theme system applied to navigation and home pages with role-based styling
 
 ## User Preferences
 
@@ -105,3 +106,10 @@ Preferred communication style: Simple, everyday language.
 - **Customer**: Dominant jaune/noir, navigation jaune avec accents verts
 - Système automatique de thèmes basé sur le rôle utilisateur
 - Variables CSS centralisées pour maintenance facile
+
+### Theme Implementation
+- **Theme Configuration**: `/client/src/lib/theme.ts` contains centralized brand colors and role-based theme definitions
+- **Navigation**: UnifiedNavbar uses `useThemeClasses` hook for dynamic role-based styling
+- **Pages**: Customer and Manager home pages apply theme classes through `getPageClasses` utility
+- **Components**: Buttons, cards, and UI elements adapt automatically to user role
+- **Maintenance**: Global color changes require only updating `brandColors` object in theme.ts

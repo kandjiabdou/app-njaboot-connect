@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useCart } from "@/hooks/use-cart";
+import { useThemeClasses } from "@/lib/theme";
 import { 
   Store, Bell, ShoppingCart, User, LogOut, Settings, Menu,
   BarChart3, Package, Users, TrendingUp, ShoppingBag, Cog, MapPin,
@@ -24,6 +25,7 @@ export default function UnifiedNavbar() {
   const { totalItems } = useCart();
   const [location, setLocation] = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { navbar } = useThemeClasses(user?.role || 'customer');
 
   const handleLogout = () => {
     logout();
@@ -69,16 +71,16 @@ export default function UnifiedNavbar() {
 
   if (!user) {
     return (
-      <nav className="bg-white dark:bg-gray-900 shadow-sm border-b">
+      <nav className="bg-[#FBB03B] shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/">
                 <div className="flex-shrink-0 flex items-center">
-                  <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                  <div className="h-8 w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
                     <Store className="h-5 w-5 text-white" />
                   </div>
-                  <span className="ml-2 text-xl font-bold text-gray-900 dark:text-white">
+                  <span className="ml-2 text-xl font-bold text-black">
                     Njaboot Connect
                   </span>
                 </div>
@@ -87,10 +89,10 @@ export default function UnifiedNavbar() {
             
             <div className="flex items-center space-x-4">
               <Link href="/login">
-                <Button variant="ghost">Se connecter</Button>
+                <Button variant="ghost" className="text-black hover:bg-black/10">Se connecter</Button>
               </Link>
               <Link href="/register">
-                <Button>S'inscrire</Button>
+                <Button className="bg-[#258C42] text-white hover:bg-[#1F7A37]">S'inscrire</Button>
               </Link>
             </div>
           </div>
@@ -100,17 +102,17 @@ export default function UnifiedNavbar() {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b">
+    <nav className={navbar.navbar}>
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 xl:px-8">
         <div className="flex justify-between items-center h-16 min-w-0">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
             <Link href={location.startsWith("/manager") ? "/manager/dashboard" : "/"}>
               <div className="flex items-center">
-                <div className="h-6 w-6 lg:h-8 lg:w-8 bg-primary rounded-lg flex items-center justify-center">
+                <div className="h-6 w-6 lg:h-8 lg:w-8 bg-[#258C42] rounded-lg flex items-center justify-center">
                   <Store className="h-3 w-3 lg:h-5 lg:w-5 text-white" />
                 </div>
-                <span className="ml-1 lg:ml-2 text-sm lg:text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap">
+                <span className={`ml-1 lg:ml-2 text-sm lg:text-xl font-bold whitespace-nowrap ${navbar.logo}`}>
                   <span className="hidden sm:inline">Njaboot Connect</span>
                   <span className="sm:hidden">Njaboot</span>
                 </span>
@@ -122,12 +124,17 @@ export default function UnifiedNavbar() {
           <div className="hidden md:flex items-center space-x-1 lg:space-x-2 xl:space-x-4 flex-1 justify-center max-w-2xl mx-4">
             {getCurrentLinks().map((link) => {
               const Icon = link.icon;
+              const isActive = isActiveLink(link.href);
               return (
                 <Link key={link.href} href={link.href}>
                   <Button
-                    variant={isActiveLink(link.href) ? "default" : "ghost"}
+                    variant="ghost"
                     size="sm"
-                    className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 text-xs lg:text-sm whitespace-nowrap"
+                    className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 xl:px-4 text-xs lg:text-sm whitespace-nowrap ${
+                      isActive 
+                        ? navbar.navTextActive 
+                        : `${navbar.navText} ${navbar.navHover}`
+                    }`}
                   >
                     <Icon className="h-3 w-3 lg:h-4 lg:w-4 flex-shrink-0" />
                     <span className="hidden lg:inline">{link.label}</span>
@@ -150,7 +157,7 @@ export default function UnifiedNavbar() {
               <div className="hidden md:block">
                 {location.startsWith("/manager") ? (
                   <Link href="/">
-                    <Button variant="outline" size="sm" className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm">
+                    <Button variant="outline" size="sm" className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm ${navbar.buttonOutline}`}>
                       <ShoppingCart className="h-3 w-3 lg:h-4 lg:w-4" />
                       <span className="hidden lg:inline">Vue Client</span>
                       <span className="lg:hidden">Client</span>
@@ -158,7 +165,7 @@ export default function UnifiedNavbar() {
                   </Link>
                 ) : (
                   <Link href="/manager/dashboard">
-                    <Button variant="outline" size="sm" className="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm">
+                    <Button variant="outline" size="sm" className={`flex items-center gap-1 lg:gap-2 px-2 lg:px-3 text-xs lg:text-sm ${navbar.buttonOutline}`}>
                       <BarChart3 className="h-3 w-3 lg:h-4 lg:w-4" />
                       <span className="hidden lg:inline">Vue Gérant</span>
                       <span className="lg:hidden">Gérant</span>
@@ -171,7 +178,7 @@ export default function UnifiedNavbar() {
             {/* Cart (desktop only) - Show for all users when not on manager routes */}
             {!location.startsWith("/manager") && (
               <Link href="/cart" className="hidden md:block">
-                <Button variant="ghost" size="sm" className="relative p-2">
+                <Button variant="ghost" size="sm" className={`relative p-2 ${navbar.buttonGhost}`}>
                   <ShoppingCart className="h-4 w-4 lg:h-5 lg:w-5" />
                   {totalItems > 0 && (
                     <Badge 
@@ -186,7 +193,7 @@ export default function UnifiedNavbar() {
             )}
 
             {/* Notifications */}
-            <Button variant="ghost" size="sm" className="p-2">
+            <Button variant="ghost" size="sm" className={`p-2 ${navbar.buttonGhost}`}>
               <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
             </Button>
 
@@ -238,7 +245,7 @@ export default function UnifiedNavbar() {
             {/* Mobile menu button */}
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="md:hidden">
+                <Button variant="ghost" size="sm" className={`md:hidden ${navbar.buttonGhost}`}>
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -267,7 +274,7 @@ export default function UnifiedNavbar() {
                         <Link href="/">
                           <Button 
                             variant="outline" 
-                            className="w-full justify-start"
+                            className={`w-full justify-start ${navbar.buttonOutline}`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <ShoppingCart className="mr-2 h-4 w-4" />
@@ -278,7 +285,7 @@ export default function UnifiedNavbar() {
                         <Link href="/manager/dashboard">
                           <Button 
                             variant="outline" 
-                            className="w-full justify-start"
+                            className={`w-full justify-start ${navbar.buttonOutline}`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <BarChart3 className="mr-2 h-4 w-4" />
@@ -293,11 +300,16 @@ export default function UnifiedNavbar() {
                   <div className="space-y-2">
                     {getCurrentLinks().map((link) => {
                       const Icon = link.icon;
+                      const isActive = isActiveLink(link.href);
                       return (
                         <Link key={link.href} href={link.href}>
                           <Button
-                            variant={isActiveLink(link.href) ? "default" : "ghost"}
-                            className="w-full justify-start"
+                            variant="ghost"
+                            className={`w-full justify-start ${
+                              isActive 
+                                ? navbar.navTextActive 
+                                : navbar.navText
+                            }`}
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             <Icon className="mr-2 h-4 w-4" />

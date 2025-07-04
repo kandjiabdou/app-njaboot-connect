@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { useThemeClasses } from "@/lib/theme";
 import { Search, Wheat, Apple, Carrot, Milk, Beef, Fish, Star, ArrowRight } from "lucide-react";
 
 const categoryIcons = {
@@ -28,6 +29,7 @@ const categoryColors = {
 
 export default function CustomerHome() {
   const { user } = useAuth();
+  const { page } = useThemeClasses('customer');
 
   // Fetch categories
   const { data: categories, isLoading: categoriesLoading } = useQuery({
@@ -58,12 +60,12 @@ export default function CustomerHome() {
                 <p className="text-xl md:text-2xl mb-8">Produits locaux, fraîcheur garantie</p>
                 <div className="space-y-4">
                   <Link href="/login">
-                    <Button size="lg" className="mr-4">
+                    <Button size="lg" className={`mr-4 ${page.buttonPrimary}`}>
                       Se connecter
                     </Button>
                   </Link>
                   <Link href="/register">
-                    <Button variant="outline" size="lg">
+                    <Button variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-black">
                       S'inscrire
                     </Button>
                   </Link>
@@ -86,8 +88,8 @@ export default function CustomerHome() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Wheat className="h-8 w-8 text-primary" />
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 ${page.bgAccent}`}>
+                    <Wheat className={`h-8 w-8 ${page.iconAccent}`} />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Produits Locaux</h3>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -98,8 +100,8 @@ export default function CustomerHome() {
 
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="h-16 w-16 bg-secondary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Star className="h-8 w-8 text-secondary" />
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 ${page.bgAccent}`}>
+                    <Star className={`h-8 w-8 ${page.iconAccent}`} />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Qualité Garantie</h3>
                   <p className="text-gray-600 dark:text-gray-400">
@@ -110,8 +112,8 @@ export default function CustomerHome() {
 
               <Card>
                 <CardContent className="p-6 text-center">
-                  <div className="h-16 w-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <ArrowRight className="h-8 w-8 text-accent" />
+                  <div className={`h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 ${page.bgAccent}`}>
+                    <ArrowRight className={`h-8 w-8 ${page.iconAccent}`} />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">Livraison Rapide</h3>
                   <p className="text-gray-600 dark:text-gray-400">
