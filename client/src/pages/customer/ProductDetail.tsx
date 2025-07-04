@@ -49,46 +49,133 @@ export default function ProductDetail() {
     enabled: !!params?.id,
   });
 
-  // Mock product images (in real app, these would come from the API)
-  const productImages = [
-    "/api/placeholder/400/400",
-    "/api/placeholder/400/400",
-    "/api/placeholder/400/400"
-  ];
+  // Generate product images based on product ID and name
+  const getProductImages = (productId: string, productName: string) => {
+    // Map different products to appropriate food images
+    const imageMap: { [key: string]: string[] } = {
+      "1": [ // Riz Parfumé Premium
+        "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&h=400&fit=crop&crop=center&q=80", // Rice grains
+        "https://images.unsplash.com/photo-1615484477778-ca3b77940c25?w=400&h=400&fit=crop&crop=center&q=80", // Rice bag
+        "https://images.unsplash.com/photo-1603106037678-47ed4b4d7075?w=400&h=400&fit=crop&crop=center&q=80"  // Cooked rice
+      ],
+      "2": [ // Farine de Mil Bio
+        "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&h=400&fit=crop&crop=center&q=80", // Flour
+        "https://images.unsplash.com/photo-1549948022-8b6229f50344?w=400&h=400&fit=crop&crop=center&q=80", // Grains
+        "https://images.unsplash.com/photo-1551106652-a5bcf4b29ab6?w=400&h=400&fit=crop&crop=center&q=80"  // Organic flour
+      ],
+      "3": [ // Huile de Palme Rouge
+        "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400&h=400&fit=crop&crop=center&q=80", // Oil bottle
+        "https://images.unsplash.com/photo-1531395872853-7e3d596e7d13?w=400&h=400&fit=crop&crop=center&q=80", // Palm oil
+        "https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=400&h=400&fit=crop&crop=center&q=80"  // Cooking oil
+      ],
+    };
 
-  // Mock detailed product data (in real app, this would be in the API response)
-  const productDetails = {
-    shortDescription: "Riz parfumé de qualité premium, idéal pour tous vos plats",
-    longDescription: "Ce riz parfumé premium est cultivé dans les meilleures rizières d'Afrique de l'Ouest. Grain long et parfumé, il se distingue par sa texture moelleuse et son arôme délicat. Parfait pour accompagner vos plats traditionnels ou vos créations culinaires modernes.",
-    category: "Céréales",
-    subCategory: "Riz",
-    unitPrice: 500,
-    promoPrice: null,
-    unit: "kg",
-    stock: 45,
-    status: "En stock",
-    weight: "1 kg",
-    volume: null,
-    dimensions: "25cm x 15cm x 5cm",
-    perishable: false,
-    expiryDate: "12 mois à partir de la date de production",
-    origin: "Côte d'Ivoire - Région de Bouaké",
-    ingredients: ["Riz long grain 100%"],
-    allergens: ["Peut contenir des traces de gluten"],
-    certifications: ["Agriculture Locale", "Sans OGM"],
-    nutritionalValues: {
-      energy: "350 kcal",
-      lipids: "0.7g",
-      carbohydrates: "77g",
-      proteins: "7.1g",
-      fiber: "1.3g",
-      sodium: "0.005g"
-    },
-    usageAdvice: "Rincer avant cuisson. Cuire dans de l'eau bouillante salée pendant 18-20 minutes.",
-    conservationAdvice: "À conserver dans un endroit sec et frais, à l'abri de la lumière.",
-    rating: 4.5,
-    reviewCount: 89
+    // Default images for unknown products
+    const defaultImages = [
+      "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop&crop=center&q=80", // Grocery products
+      "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&h=400&fit=crop&crop=center&q=80", // Food items
+      "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&h=400&fit=crop&crop=center&q=80"  // African food
+    ];
+
+    return imageMap[productId] || defaultImages;
   };
+
+  const productImages = getProductImages(params?.id || "1", product?.name || "");
+
+  // Generate dynamic product details based on the actual product
+  const getProductDetails = (prod: any) => {
+    if (!prod) return null;
+
+    // Base details from the API product
+    const baseDetails = {
+      shortDescription: prod.description || "Produit de qualité premium pour vos repas",
+      longDescription: prod.description || "Produit alimentaire de haute qualité, soigneusement sélectionné pour vous offrir le meilleur goût et la meilleure nutrition.",
+      category: prod.category || "Épicerie",
+      subCategory: prod.subCategory || "Produit alimentaire",
+      unitPrice: prod.price || 1000,
+      promoPrice: prod.promoPrice || null,
+      unit: prod.unit || "unité",
+      stock: Math.floor(Math.random() * 50) + 10, // Random stock between 10-60
+      status: "En stock",
+      weight: prod.weight || "1 kg",
+      volume: prod.volume || null,
+      dimensions: "25cm x 15cm x 5cm",
+      perishable: prod.perishable || false,
+      expiryDate: "12 mois à partir de la date de production",
+      origin: "Sénégal - Produit local",
+      rating: 4.0 + Math.random() * 1, // Random rating between 4.0-5.0
+      reviewCount: Math.floor(Math.random() * 100) + 20 // Random reviews 20-120
+    };
+
+    // Product-specific details
+    const productSpecificDetails: { [key: string]: any } = {
+      "1": { // Riz Parfumé Premium
+        shortDescription: "Riz parfumé de qualité premium, idéal pour tous vos plats",
+        longDescription: "Ce riz parfumé premium est cultivé dans les meilleures rizières d'Afrique de l'Ouest. Grain long et parfumé, il se distingue par sa texture moelleuse et son arôme délicat. Parfait pour accompagner vos plats traditionnels ou vos créations culinaires modernes.",
+        category: "Céréales",
+        subCategory: "Riz",
+        ingredients: ["Riz long grain 100%"],
+        allergens: ["Peut contenir des traces de gluten"],
+        certifications: ["Agriculture Locale", "Sans OGM"],
+        nutritionalValues: {
+          energy: "350 kcal",
+          lipids: "0.7g",
+          carbohydrates: "77g",
+          proteins: "7.1g",
+          fiber: "1.3g",
+          sodium: "0.005g"
+        },
+        usageAdvice: "Rincer avant cuisson. Cuire dans de l'eau bouillante salée pendant 18-20 minutes.",
+        conservationAdvice: "À conserver dans un endroit sec et frais, à l'abri de la lumière.",
+        origin: "Sénégal - Vallée du fleuve Sénégal",
+      },
+      "2": { // Farine de Mil Bio
+        shortDescription: "Farine de mil biologique, riche en nutriments essentiels",
+        longDescription: "Farine de mil 100% biologique, moulue à partir de grains sélectionnés. Riche en protéines, fibres et minéraux, cette farine est parfaite pour préparer vos plats traditionnels comme le couscous de mil, les galettes ou les bouillies nutritives.",
+        category: "Farines",
+        subCategory: "Farine de mil",
+        ingredients: ["Mil biologique 100%"],
+        allergens: ["Sans gluten", "Peut contenir des traces de soja"],
+        certifications: ["Bio", "Commerce Équitable", "Sans Gluten"],
+        nutritionalValues: {
+          energy: "378 kcal",
+          lipids: "4.2g",
+          carbohydrates: "73g",
+          proteins: "11g",
+          fiber: "8.5g",
+          sodium: "0.005g"
+        },
+        usageAdvice: "Mélanger avec de l'eau tiède pour faire une pâte. Idéal pour galettes, couscous et bouillies.",
+        conservationAdvice: "À conserver au sec, dans un récipient hermétique.",
+        origin: "Sénégal - Région de Thiès",
+      },
+      "3": { // Huile de Palme Rouge
+        shortDescription: "Huile de palme rouge naturelle, non raffinée",
+        longDescription: "Huile de palme rouge artisanale, extraite à froid pour préserver tous ses nutriments. Riche en vitamine A et en antioxydants, elle donne une saveur authentique et une belle couleur à vos plats traditionnels.",
+        category: "Huiles",
+        subCategory: "Huile végétale",
+        ingredients: ["Huile de palme rouge 100%"],
+        allergens: ["Sans allergènes"],
+        certifications: ["Artisanal", "Non raffiné"],
+        nutritionalValues: {
+          energy: "884 kcal",
+          lipids: "100g",
+          carbohydrates: "0g",
+          proteins: "0g",
+          fiber: "0g",
+          sodium: "0g"
+        },
+        usageAdvice: "Utiliser pour la cuisson, les assaisonnements et les sauces traditionnelles.",
+        conservationAdvice: "À conserver à température ambiante, à l'abri de la lumière.",
+        origin: "Guinée-Bissau - Production artisanale",
+      }
+    };
+
+    const specific = productSpecificDetails[prod.id?.toString()] || {};
+    return { ...baseDetails, ...specific };
+  };
+
+  const productDetails = getProductDetails(product);
 
   const handleAddToCart = () => {
     if (product) {
@@ -128,7 +215,7 @@ export default function ProductDetail() {
     );
   }
 
-  if (!product) {
+  if (!product || !productDetails) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Produit non trouvé</h2>
@@ -154,8 +241,12 @@ export default function ProductDetail() {
           <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
             <img
               src={productImages[selectedImage]}
-              alt={product.name}
+              alt={product?.name || "Produit"}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback to a default image if the image fails to load
+                e.currentTarget.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop&crop=center&q=80";
+              }}
             />
           </div>
           <div className="flex space-x-2">
@@ -167,7 +258,14 @@ export default function ProductDetail() {
                   selectedImage === index ? 'border-primary' : 'border-gray-200'
                 }`}
               >
-                <img src={image} alt="" className="w-full h-full object-cover" />
+                <img 
+                  src={image} 
+                  alt="" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop&crop=center&q=80";
+                  }}
+                />
               </button>
             ))}
           </div>

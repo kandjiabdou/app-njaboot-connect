@@ -96,7 +96,7 @@ export default function StoreFinder() {
       distance: 13.5,
       rating: 4.2,
       hours: "8h00 - 19h00",
-      coordinates: { lat: 14.7845, lng: -17.4234 }, // Parcelles Assainies
+      coordinates: { lat: 14.7595, lng: -17.4234}, // Parcelles Assainies
     },
     {
       id: 6,
