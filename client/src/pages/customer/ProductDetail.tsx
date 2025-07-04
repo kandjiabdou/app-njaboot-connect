@@ -386,12 +386,12 @@ export default function ProductDetail() {
 
       {/* Onglets détaillés */}
       <Tabs defaultValue="description" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="description">Description</TabsTrigger>
-          <TabsTrigger value="nutrition">Nutrition</TabsTrigger>
-          <TabsTrigger value="logistics">Logistique</TabsTrigger>
-          <TabsTrigger value="stores">Boutiques</TabsTrigger>
-          <TabsTrigger value="reviews">Avis</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
+          <TabsTrigger value="description" className="text-xs sm:text-sm">Description</TabsTrigger>
+          <TabsTrigger value="nutrition" className="text-xs sm:text-sm">Nutrition</TabsTrigger>
+          <TabsTrigger value="logistics" className="text-xs sm:text-sm">Logistique</TabsTrigger>
+          <TabsTrigger value="stores" className="text-xs sm:text-sm">Boutiques</TabsTrigger>
+          <TabsTrigger value="reviews" className="text-xs sm:text-sm">Avis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="description" className="space-y-4">

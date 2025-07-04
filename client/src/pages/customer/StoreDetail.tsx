@@ -40,10 +40,20 @@ export default function StoreDetail() {
     enabled: !!params?.id,
   });
 
+  // Generate store image based on store ID and name
+  const getStoreImage = (storeId: string, storeName: string) => {
+    const storeImages: { [key: string]: string } = {
+      "1": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop&crop=center&q=80", // Grocery store
+      "2": "https://images.unsplash.com/photo-1604719312566-878528dcab91?w=800&h=400&fit=crop&crop=center&q=80", // Market
+      "3": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop&crop=center&q=80", // Local store
+    };
+    return storeImages[storeId] || "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop&crop=center&q=80";
+  };
+
   // Mock store detailed data (in real app, this would come from API)
   const storeDetails = {
     description: "Boutique partenaire Njaboot dans le quartier Plateau, ouverte depuis 2023. Spécialisée dans les produits frais et l'épicerie locale.",
-    imageUrl: "/api/placeholder/600/300",
+    imageUrl: getStoreImage(params?.id || "1", store?.name || ""),
     status: "open", // open, closed, temporarily_closed
     rating: 4.3,
     reviewCount: 127,
@@ -126,16 +136,19 @@ export default function StoreDetail() {
     <div className="container mx-auto px-4 py-8">
       {/* Header avec image et infos principales */}
       <div className="mb-8">
-        <div className="relative h-64 md:h-80 rounded-lg overflow-hidden mb-6">
+        <div className="relative h-48 sm:h-64 md:h-80 rounded-lg overflow-hidden mb-6">
           <img
             src={storeDetails.imageUrl}
-            alt={store.name}
+            alt={store?.name || "Boutique"}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop&crop=center&q=80";
+            }}
           />
           <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
-            <div className="p-6 text-white">
-              <h1 className="text-3xl font-bold mb-2">{store.name}</h1>
-              <p className="text-lg opacity-90">{storeDetails.description}</p>
+            <div className="p-4 sm:p-6 text-white">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">{store?.name}</h1>
+              <p className="text-sm sm:text-base md:text-lg opacity-90 line-clamp-2">{storeDetails.description}</p>
             </div>
           </div>
         </div>
@@ -182,12 +195,12 @@ export default function StoreDetail() {
 
       {/* Onglets détaillés */}
       <Tabs defaultValue="products" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="products">Produits</TabsTrigger>
-          <TabsTrigger value="info">Informations</TabsTrigger>
-          <TabsTrigger value="hours">Horaires</TabsTrigger>
-          <TabsTrigger value="services">Services</TabsTrigger>
-          <TabsTrigger value="promotions">Promotions</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1">
+          <TabsTrigger value="products" className="text-xs sm:text-sm">Produits</TabsTrigger>
+          <TabsTrigger value="info" className="text-xs sm:text-sm">Infos</TabsTrigger>
+          <TabsTrigger value="hours" className="text-xs sm:text-sm">Horaires</TabsTrigger>
+          <TabsTrigger value="services" className="text-xs sm:text-sm">Services</TabsTrigger>
+          <TabsTrigger value="promotions" className="text-xs sm:text-sm">Promos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="products" className="space-y-4">
