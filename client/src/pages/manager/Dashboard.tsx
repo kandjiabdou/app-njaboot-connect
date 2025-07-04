@@ -264,254 +264,251 @@ export default function ManagerDashboard() {
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-                {/* Section Produits - Gauche */}
-                <div className="flex-1 flex flex-col min-h-0 max-h-full overflow-hidden">
-                  {/* Barre de recherche */}
-                  <div className="flex-shrink-0 p-4 md:p-6 pb-3 md:pb-4 border-b lg:border-b-0">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        placeholder="Rechercher un produit..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 h-12 text-base"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Grille des produits avec scroll */}
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <div className="p-4 md:p-6 pt-4 pb-8">
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                        {filteredProducts.map((product) => (
-                          <Card 
-                            key={product.id} 
-                            className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary/50"
-                            onClick={() => addToCart(product)}
-                          >
-                            <CardContent className="p-4 text-center">
-                              <div className="text-3xl md:text-4xl mb-3">{product.imageUrl}</div>
-                              <div className="text-sm md:text-base font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[2.5rem]">
-                                {product.name}
-                              </div>
-                              <div className="text-xs md:text-sm text-gray-500 mb-2">
-                                {formatCurrency(product.price)}/{product.unit}
-                              </div>
-                              <Badge variant="outline" className="text-xs">
-                                {product.category}
-                              </Badge>
-                            </CardContent>
-                          </Card>
-                        ))}
+              {/* Contenu avec un seul scroll global */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="flex flex-col lg:flex-row min-h-full">
+                  {/* Section Produits - Gauche */}
+                  <div className="flex-1 p-4 md:p-6">
+                    {/* Barre de recherche */}
+                    <div className="mb-6">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Input
+                          placeholder="Rechercher un produit..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10 h-12 text-base"
+                        />
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                {/* Section Panier - Droite */}
-                <div className="w-full lg:w-96 flex flex-col bg-gray-50 dark:bg-gray-900 border-t lg:border-t-0 lg:border-l min-h-0 max-h-full overflow-hidden">
-                  {/* En-tête du panier */}
-                  <div className="flex-shrink-0 p-4 md:p-6 border-b">
-                    <h3 className="font-semibold text-lg mb-4">Panier</h3>
-                    
-                    {/* Sélection client */}
-                    <div>
-                      <label className="block text-sm font-medium mb-3">Client</label>
-                      <Select onValueChange={(value) => setSelectedCustomer(value)}>
-                        <SelectTrigger className="w-full h-12">
-                          <SelectValue placeholder="Sélectionner un client..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="anonymous">
-                            <div className="flex items-center gap-2">
-                              <User className="h-4 w-4" />
-                              <span>Client Anonyme</span>
+                    {/* Grille des produits */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6 mb-6">
+                      {filteredProducts.map((product) => (
+                        <Card 
+                          key={product.id} 
+                          className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:scale-105 border-2 hover:border-primary/50"
+                          onClick={() => addToCart(product)}
+                        >
+                          <CardContent className="p-4 text-center">
+                            <div className="text-3xl md:text-4xl mb-3">{product.imageUrl}</div>
+                            <div className="text-sm md:text-base font-medium text-gray-900 dark:text-white mb-2 line-clamp-2 min-h-[2.5rem]">
+                              {product.name}
                             </div>
-                          </SelectItem>
-                          {customers?.slice(0, 10).map((customer: any) => (
-                            <SelectItem key={customer.id} value={customer.id.toString()}>
-                              <div className="flex items-center gap-2">
-                                <User className="h-4 w-4" />
-                                <span>{customer.firstName} {customer.lastName}</span>
-                                <span className="text-xs text-gray-500">({customer.email})</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            <div className="text-xs md:text-sm text-gray-500 mb-2">
+                              {formatCurrency(product.price)}/{product.unit}
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {product.category}
+                            </Badge>
+                          </CardContent>
+                        </Card>
+                      ))}
                     </div>
                   </div>
 
-                  {/* Articles du panier avec scroll */}
-                  <div className="flex-1 min-h-0 overflow-y-auto">
-                    <div className="p-4 md:p-6 pb-4">
-                      {cartItems.length === 0 ? (
-                        <div className="text-center text-gray-500 py-12">
-                          <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                          <p className="font-medium mb-2">Panier vide</p>
-                          <p className="text-sm">Cliquez sur un produit pour l'ajouter</p>
+                  {/* Section Panier - Droite */}
+                  <div className="w-full lg:w-96 bg-gray-50 dark:bg-gray-900 border-t lg:border-t-0 lg:border-l">
+                    <div className="p-4 md:p-6">
+                      {/* En-tête du panier */}
+                      <div className="mb-6">
+                        <h3 className="font-semibold text-lg mb-4">Panier</h3>
+                        
+                        {/* Sélection client */}
+                        <div className="mb-6">
+                          <label className="block text-sm font-medium mb-3">Client</label>
+                          <Select onValueChange={(value) => setSelectedCustomer(value)}>
+                            <SelectTrigger className="w-full h-12">
+                              <SelectValue placeholder="Sélectionner un client..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="anonymous">
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4" />
+                                  <span>Client Anonyme</span>
+                                </div>
+                              </SelectItem>
+                              {customers?.slice(0, 10).map((customer: any) => (
+                                <SelectItem key={customer.id} value={customer.id.toString()}>
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4" />
+                                    <span>{customer.firstName} {customer.lastName}</span>
+                                    <span className="text-xs text-gray-500">({customer.email})</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
-                      ) : (
-                        <div className="space-y-4 pb-4">
-                          {cartItems.map((item) => (
-                            <div key={item.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
-                              <div className="text-2xl flex-shrink-0 mt-1">{item.imageUrl}</div>
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium mb-1 text-gray-900 dark:text-white">
-                                  {item.name}
-                                </div>
-                                <div className="text-xs text-gray-500 mb-3">
-                                  {formatCurrency(item.price)}/{item.unit}
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
+                      </div>
+
+                      {/* Articles du panier */}
+                      <div className="mb-6">
+                        {cartItems.length === 0 ? (
+                          <div className="text-center text-gray-500 py-12">
+                            <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                            <p className="font-medium mb-2">Panier vide</p>
+                            <p className="text-sm">Cliquez sur un produit pour l'ajouter</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            {cartItems.map((item) => (
+                              <div key={item.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border">
+                                <div className="text-2xl flex-shrink-0 mt-1">{item.imageUrl}</div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium mb-1 text-gray-900 dark:text-white">
+                                    {item.name}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mb-3">
+                                    {formatCurrency(item.price)}/{item.unit}
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-9 w-9 p-0"
+                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      >
+                                        <Minus className="h-4 w-4" />
+                                      </Button>
+                                      <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-9 w-9 p-0"
+                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                     <Button
                                       size="sm"
-                                      variant="outline"
-                                      className="h-9 w-9 p-0"
-                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                      variant="ghost"
+                                      className="h-9 w-9 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                      onClick={() => removeFromCart(item.id)}
                                     >
-                                      <Minus className="h-4 w-4" />
-                                    </Button>
-                                    <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="h-9 w-9 p-0"
-                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                    >
-                                      <Plus className="h-4 w-4" />
+                                      <X className="h-4 w-4" />
                                     </Button>
                                   </div>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-9 w-9 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                                    onClick={() => removeFromCart(item.id)}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
                                 </div>
                               </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Total et paiement */}
+                      {cartItems.length > 0 && (
+                        <div className="border-t bg-white dark:bg-gray-800 -mx-6 px-6 py-6">
+                          {/* Total */}
+                          <div className="mb-6">
+                            <div className="text-center bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+                              <div className="text-3xl font-bold text-green-600 mb-2">
+                                {formatCurrency(getTotal())}
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                {cartItems.reduce((sum, item) => sum + item.quantity, 0)} article(s)
+                              </div>
                             </div>
-                          ))}
+                          </div>
+
+                          {/* Formulaire de paiement */}
+                          <Form {...form}>
+                            <form onSubmit={form.handleSubmit((data) => newSaleMutation.mutate(data))} className="space-y-6">
+                              <FormField
+                                control={form.control}
+                                name="paymentMethod"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-base font-medium">Méthode de Paiement</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                      <FormControl>
+                                        <SelectTrigger className="h-14 text-base">
+                                          <SelectValue placeholder="Sélectionnez une méthode" />
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent>
+                                        <SelectItem value="cash">
+                                          <div className="flex items-center gap-3 py-2">
+                                            <Banknote className="h-5 w-5 text-green-600" />
+                                            <div>
+                                              <div className="font-medium">Espèces</div>
+                                              <div className="text-xs text-gray-500">Paiement en cash</div>
+                                            </div>
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="card">
+                                          <div className="flex items-center gap-3 py-2">
+                                            <CreditCard className="h-5 w-5 text-blue-600" />
+                                            <div>
+                                              <div className="font-medium">Carte Bancaire</div>
+                                              <div className="text-xs text-gray-500">Visa, Mastercard</div>
+                                            </div>
+                                          </div>
+                                        </SelectItem>
+                                        <SelectItem value="mobile">
+                                          <div className="flex items-center gap-3 py-2">
+                                            <Smartphone className="h-5 w-5 text-orange-600" />
+                                            <div>
+                                              <div className="font-medium">Mobile Money</div>
+                                              <div className="text-xs text-gray-500">Orange Money, Wave</div>
+                                            </div>
+                                          </div>
+                                        </SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={form.control}
+                                name="notes"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel className="text-base font-medium">Notes (optionnel)</FormLabel>
+                                    <FormControl>
+                                      <Textarea 
+                                        placeholder="Commentaires sur la vente..."
+                                        className="min-h-[100px] text-base resize-none"
+                                        {...field} 
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <div className="flex gap-4 pt-4">
+                                <Button 
+                                  type="button" 
+                                  variant="outline" 
+                                  onClick={() => {
+                                    setNewSaleOpen(false);
+                                    setCartItems([]);
+                                    setSearchTerm("");
+                                    setSelectedCustomer(null);
+                                  }}
+                                  className="flex-1 h-14 text-base"
+                                >
+                                  Annuler
+                                </Button>
+                                <Button 
+                                  type="submit" 
+                                  disabled={newSaleMutation.isPending}
+                                  className="flex-1 h-14 bg-green-600 hover:bg-green-700 text-white font-medium text-base"
+                                >
+                                  {newSaleMutation.isPending ? "Traitement..." : "Finaliser la Vente"}
+                                </Button>
+                              </div>
+                            </form>
+                          </Form>
                         </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Total et paiement */}
-                  {cartItems.length > 0 && (
-                    <div className="flex-shrink-0 border-t bg-white dark:bg-gray-800 max-h-[60vh] overflow-y-auto">
-                      {/* Total */}
-                      <div className="p-4 md:p-6 border-b">
-                        <div className="text-center bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
-                          <div className="text-3xl font-bold text-green-600 mb-2">
-                            {formatCurrency(getTotal())}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {cartItems.reduce((sum, item) => sum + item.quantity, 0)} article(s)
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Méthode de paiement */}
-                      <div className="p-4 md:p-6 pb-6">
-                        <Form {...form}>
-                          <form onSubmit={form.handleSubmit((data) => newSaleMutation.mutate(data))} className="space-y-6">
-                            <FormField
-                              control={form.control}
-                              name="paymentMethod"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className="text-base font-medium">Méthode de Paiement</FormLabel>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                      <SelectTrigger className="h-14 text-base">
-                                        <SelectValue placeholder="Sélectionnez une méthode" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      <SelectItem value="cash">
-                                        <div className="flex items-center gap-3 py-2">
-                                          <Banknote className="h-5 w-5 text-green-600" />
-                                          <div>
-                                            <div className="font-medium">Espèces</div>
-                                            <div className="text-xs text-gray-500">Paiement en cash</div>
-                                          </div>
-                                        </div>
-                                      </SelectItem>
-                                      <SelectItem value="card">
-                                        <div className="flex items-center gap-3 py-2">
-                                          <CreditCard className="h-5 w-5 text-blue-600" />
-                                          <div>
-                                            <div className="font-medium">Carte Bancaire</div>
-                                            <div className="text-xs text-gray-500">Visa, Mastercard</div>
-                                          </div>
-                                        </div>
-                                      </SelectItem>
-                                      <SelectItem value="mobile">
-                                        <div className="flex items-center gap-3 py-2">
-                                          <Smartphone className="h-5 w-5 text-orange-600" />
-                                          <div>
-                                            <div className="font-medium">Mobile Money</div>
-                                            <div className="text-xs text-gray-500">Orange Money, Wave</div>
-                                          </div>
-                                        </div>
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <FormField
-                              control={form.control}
-                              name="notes"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel className="text-base font-medium">Notes (optionnel)</FormLabel>
-                                  <FormControl>
-                                    <Textarea 
-                                      placeholder="Commentaires sur la vente..."
-                                      className="min-h-[100px] text-base resize-none"
-                                      {...field} 
-                                    />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
-
-                            <div className="flex gap-4 pt-4">
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={() => {
-                                  setNewSaleOpen(false);
-                                  setCartItems([]);
-                                  setSearchTerm("");
-                                  setSelectedCustomer(null);
-                                }}
-                                className="flex-1 h-14 text-base"
-                              >
-                                Annuler
-                              </Button>
-                              <Button 
-                                type="submit" 
-                                disabled={newSaleMutation.isPending}
-                                className="flex-1 h-14 bg-green-600 hover:bg-green-700 text-white font-medium text-base"
-                              >
-                                {newSaleMutation.isPending ? "Traitement..." : "Finaliser la Vente"}
-                              </Button>
-                            </div>
-                          </form>
-                        </Form>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             </DialogContent>
